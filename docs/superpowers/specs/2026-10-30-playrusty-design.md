@@ -31,8 +31,9 @@ The mode can be changed at any time in Settings. Changing it never removes earne
 
 ### 2.2 World map
 - An inline-SVG archipelago with one island per rustlings topic.
-- Ferris the crab (public-domain mascot from rustacean.net) stands on the current island
-  and walks along a dotted path when the player travels.
+- Ferris the crab stands on the current island and walks along a dotted path when the
+  player travels. We use our own inline-SVG drawing in the spirit of the public-domain Rust
+  mascot.
 - Islands that are not yet available are shown greyed out with a lock. In v1, islands 4+
   appear as "coming soon" so players can see the whole journey.
 - A HUD shows total XP, total stars and earned badges.
@@ -127,6 +128,7 @@ and may try again. Every wrong attempt counts as a mistake. On a correct answer 
 - `#/island/:islandId` is an island.
 - `#/stage/:islandId/:stageId` is a stage.
 - `#/boss/:islandId` is a boss fight.
+- `#/celebrate/:islandId` is the boss-defeated screen.
 - `#/settings` is the settings screen.
 
 ```
@@ -160,7 +162,8 @@ PlayRusty/
 │  │     └─ 03-if.ts
 │  └─ styles/
 ├─ scripts/
-│  └─ verify-bosses.ts        CI: compile every boss with real cargo
+│  ├─ rust-checks.ts          collects what to compile (pure, unit-tested)
+│  └─ verify-rust.ts          CI: compile every boss + runnable example with real cargo
 ├─ tests/                     Vitest unit tests
 ├─ .github/workflows/deploy.yml
 ├─ LICENSE                    MIT
@@ -169,9 +172,9 @@ PlayRusty/
 
 ### 3.1 Unit boundaries
 - **`engine/`** has no DOM access. `progress.ts` is pure functions over `(content, save, mode)`.
-- **`puzzles/`**: each module exports a `PuzzleModule` with
-  `render(puzzle, container, onAnswer)` and a pure `check(puzzle, answer) → boolean`.
-  The stage screen uses only this interface.
+- **`puzzles/`**: each module exports a `renderX(puzzle, container, onSubmit)` and a pure
+  `checkX(puzzle, answer) → boolean`. The stage screen uses only the dispatcher
+  `renderPuzzle(puzzle, container, onResult(correct))`.
 - **`playground/`** knows nothing about the game. It takes a code string and returns a result.
 - **`content/`** is pure typed data with no logic.
 - **`ui/`** connects the other units together. It is the only layer that touches the DOM.
@@ -285,9 +288,13 @@ interface SaveData {
   - every boss has ≥1 `#[test]`, 1–3 hints and a non-empty solution
   - every stage has ≥1 tutorial page and ≥1 puzzle
   - the island has ≥1 stage visible in experienced mode
-- **Boss verification (`scripts/verify-bosses.ts`):** for each boss, writes a temp cargo
-  project (edition 2024) and runs `cargo test`. It asserts that **starter + tests fail**
-  and **solution + tests pass**. It runs locally (`npm run verify:bosses`) and in CI.
+- **Rust verification (`scripts/verify-rust.ts`):**
+  - For each boss, it writes a temp cargo project (edition 2024) and runs `cargo test`. It
+    asserts that **starter + tests fail** and **solution + tests pass**.
+  - For every `runnable` tutorial page, it asserts that `cargo run` succeeds.
+  - Each check gets a unique cargo package name, because a shared target directory
+    otherwise reuses stale binaries.
+  - It runs locally (`npm run verify:rust`) and in CI.
 - **Manual:** play through all three islands in both modes in the browser before release.
 
 ## 8. Deployment
@@ -298,7 +305,7 @@ interface SaveData {
   2. setup Node and stable Rust
   3. `npm ci`
   4. `npm test`
-  5. `npm run verify:bosses`
+  5. `npm run verify:rust`
   6. `npm run build`
   7. upload the Pages artifact
   8. deploy with `actions/deploy-pages`
