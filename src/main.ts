@@ -6,6 +6,7 @@ import { createAppContext, type Cleanup } from "./ui/app";
 import { renderIsland } from "./ui/screens/island";
 import { renderMap } from "./ui/screens/map";
 import { renderSettings } from "./ui/screens/settings";
+import { renderStage } from "./ui/screens/stage";
 import { renderTitle } from "./ui/screens/title";
 
 const rootElement = document.getElementById("app");
@@ -38,6 +39,9 @@ function show(route: Route): void {
       break;
     case "island":
       cleanup = renderIsland(root, ctx, route.islandId);
+      break;
+    case "stage":
+      cleanup = renderStage(root, ctx, route.islandId, route.stageId);
       break;
     default:
       // Screens for the remaining routes are added in later tasks.
