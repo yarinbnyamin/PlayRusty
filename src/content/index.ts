@@ -1,6 +1,7 @@
 import type { ComingSoonIsland, Island } from "../engine/types";
+import { variablesIsland } from "./islands/01-variables";
 
-export const islands: Island[] = [];
+export const islands: Island[] = [variablesIsland];
 
 /** The whole journey, one island per rustlings topic. Playable islands are filtered out below. */
 const ROADMAP: ComingSoonIsland[] = [
