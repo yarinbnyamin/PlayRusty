@@ -541,11 +541,12 @@ export const variablesIsland: Island = {
     starter: rs`
       // Fix every line marked FIX ME so the program compiles and all the tests pass.
       //
-      // The fn ... { lines are functions. You'll learn them on the next island;
-      // for now, leave those lines as they are and fix the code inside.
+      // The fn ... { lines are functions. You'll learn them on the next island.
+      // For now, leave the fn lines alone, and also leave the last line of each
+      // function as it is: a last line with no semicolon hands its value back.
 
       const BRIDGE_TOLL: u32 = 3;
-      const GOLEM_HEIGHT = 12; // FIX ME
+      const GOLEM_HEIGHT = 12; // FIX ME: the golem's height is a u32
 
       fn coins_after_bridge() -> u32 {
           let coins = 10;
