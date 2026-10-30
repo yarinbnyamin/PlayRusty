@@ -3,6 +3,8 @@ import { comingSoon, islands } from "./content/index";
 import { createSaveStore, getBrowserStorage } from "./engine/save";
 import { onRouteChange, type Route } from "./router";
 import { createAppContext, type Cleanup } from "./ui/app";
+import { renderBoss } from "./ui/screens/boss";
+import { renderCelebrate } from "./ui/screens/celebrate";
 import { renderIsland } from "./ui/screens/island";
 import { renderMap } from "./ui/screens/map";
 import { renderSettings } from "./ui/screens/settings";
@@ -43,9 +45,12 @@ function show(route: Route): void {
     case "stage":
       cleanup = renderStage(root, ctx, route.islandId, route.stageId);
       break;
-    default:
-      // Screens for the remaining routes are added in later tasks.
-      cleanup = renderTitle(root, ctx);
+    case "boss":
+      cleanup = renderBoss(root, ctx, route.islandId);
+      break;
+    case "celebrate":
+      cleanup = renderCelebrate(root, ctx, route.islandId);
+      break;
   }
 }
 
