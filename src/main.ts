@@ -3,6 +3,8 @@ import { comingSoon, islands } from "./content/index";
 import { createSaveStore, getBrowserStorage } from "./engine/save";
 import { onRouteChange, type Route } from "./router";
 import { createAppContext, type Cleanup } from "./ui/app";
+import { renderIsland } from "./ui/screens/island";
+import { renderMap } from "./ui/screens/map";
 import { renderSettings } from "./ui/screens/settings";
 import { renderTitle } from "./ui/screens/title";
 
@@ -30,6 +32,12 @@ function show(route: Route): void {
       break;
     case "settings":
       cleanup = renderSettings(root, ctx);
+      break;
+    case "map":
+      cleanup = renderMap(root, ctx);
+      break;
+    case "island":
+      cleanup = renderIsland(root, ctx, route.islandId);
       break;
     default:
       // Screens for the remaining routes are added in later tasks.
