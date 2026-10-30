@@ -20,7 +20,10 @@ export function renderFillGap(puzzle: FillGapPuzzle, container: HTMLElement, onS
   const submit = () => onSubmit(inputs.map((input) => input.value));
   for (const input of inputs) {
     input.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") submit();
+      if (event.key === "Enter") {
+        event.preventDefault();
+        submit();
+      }
     });
   }
   container.append(

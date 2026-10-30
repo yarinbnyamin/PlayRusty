@@ -53,6 +53,19 @@ describe("renderers", () => {
     expect(submitted).toEqual(["mut", "i32"]);
   });
 
+  it("fillGap submits on Enter and prevents the default so the keypress cannot reach a newly focused button", () => {
+    const container = document.createElement("div");
+    let submitted: string[] = [];
+    renderFillGap(fillGap, container, (answer) => (submitted = answer));
+    const inputs = container.querySelectorAll("input");
+    inputs[0].value = "mut";
+    inputs[1].value = "i32";
+    const event = new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true });
+    inputs[0].dispatchEvent(event);
+    expect(submitted).toEqual(["mut", "i32"]);
+    expect(event.defaultPrevented).toBe(true);
+  });
+
   it("pickFix choice buttons are named by their code, not a generic label", () => {
     const container = document.createElement("div");
     renderPickFix(pickFix, container, () => {});

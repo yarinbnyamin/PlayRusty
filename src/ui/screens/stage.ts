@@ -66,12 +66,19 @@ export function renderStage(root: HTMLElement, ctx: AppContext, islandId: string
     );
 
     let solved = false;
+    let wrongHere = 0;
     renderPuzzle(puzzle, area, (correct) => {
       if (solved) return;
       if (!correct) {
         mistakes += 1;
-        const tip = puzzle.type === "fillGap" ? puzzle.hint : puzzle.explanation;
-        feedback.replaceChildren(h("p", { class: "bad" }, "✗ Not quite. Try again!"), prose(tip));
+        wrongHere += 1;
+        if (puzzle.type === "fillGap") {
+          feedback.replaceChildren(h("p", { class: "bad" }, "✗ Not quite. Try again!"), prose(puzzle.hint));
+        } else if (wrongHere === 1) {
+          feedback.replaceChildren(h("p", { class: "bad" }, "✗ Not quite. Read the code again carefully and try another answer."));
+        } else {
+          feedback.replaceChildren(h("p", { class: "bad" }, "✗ Not quite. Try again!"), prose(puzzle.explanation));
+        }
         return;
       }
       solved = true;
@@ -81,7 +88,7 @@ export function renderStage(root: HTMLElement, ctx: AppContext, islandId: string
       const next = h("button", { class: "btn primary", onclick: () => (isLast ? finish() : showPuzzle(index + 1)) },
         isLast ? "Finish the stage →" : "Continue →");
       feedback.replaceChildren(h("p", { class: "good" }, "✓ Correct!"), prose(puzzle.explanation), next);
-      next.focus();
+      setTimeout(() => next.focus());
     });
   }
 
