@@ -62,3 +62,29 @@ describe("createSaveStore without storage", () => {
     expect(store.reset()).toEqual(newSave());
   });
 });
+
+describe("createSaveStore when the backup cannot be written", () => {
+  it("still clears the corrupt save and starts fresh without throwing", () => {
+    const data = new Map<string, string>();
+    const fake: Storage = {
+      get length() {
+        return data.size;
+      },
+      clear: () => data.clear(),
+      getItem: (key) => data.get(key) ?? null,
+      key: (index) => [...data.keys()][index] ?? null,
+      removeItem: (key) => {
+        data.delete(key);
+      },
+      setItem: (key, value) => {
+        if (key.startsWith(`${SAVE_KEY}.backup-`)) throw new DOMException("full", "QuotaExceededError");
+        data.set(key, value);
+      },
+    };
+    fake.setItem(SAVE_KEY, "{not json");
+    const store = createSaveStore(fake, () => 9);
+    expect(store.load()).toEqual(newSave());
+    expect(fake.getItem(SAVE_KEY)).toBeNull();
+    expect(store.load()).toEqual(newSave());
+  });
+});

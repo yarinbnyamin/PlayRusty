@@ -56,7 +56,11 @@ export function createSaveStore(storage: Storage | null, now: () => number = Dat
       }
       const save = migrate(parsed);
       if (save) return save;
-      storage.setItem(`${SAVE_KEY}.backup-${now()}`, raw);
+      try {
+        storage.setItem(`${SAVE_KEY}.backup-${now()}`, raw);
+      } catch {
+        // Backup failed (e.g. quota): skip it, but still clear the unreadable save below.
+      }
       storage.removeItem(SAVE_KEY);
       return newSave();
     },
