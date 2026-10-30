@@ -22,7 +22,7 @@ export function renderIsland(root: HTMLElement, ctx: AppContext, islandId: strin
         unlocked
           ? h("a", { class: "stage-card", href: routeToHash({ name: "stage", islandId: island.id, stageId: stage.id }) },
               h("span", {}, stage.title),
-              h("span", { class: "stars", "aria-label": stars ? `${stars} of 3 stars` : "not completed" }, starsLabel(stars)))
+              h("span", { class: "stars", role: "img", "aria-label": stars ? `${stars} of 3 stars` : "not completed" }, starsLabel(stars)))
           : h("div", { class: "stage-card locked", "aria-disabled": "true" }, h("span", {}, `🔒 ${stage.title}`))),
     );
   }
@@ -31,7 +31,7 @@ export function renderIsland(root: HTMLElement, ctx: AppContext, islandId: strin
   const bossCard = isBossUnlocked(ctx.islands, island.id, save)
     ? h("a", { class: "stage-card boss", href: routeToHash({ name: "boss", islandId: island.id }) },
         h("span", {}, `⚔ Boss: ${island.boss.name}`),
-        h("span", { class: "stars" }, starsLabel(bossStars)))
+        h("span", { class: "stars", role: "img", "aria-label": bossStars ? `${bossStars} of 3 stars` : "not completed" }, starsLabel(bossStars)))
     : h("div", { class: "stage-card boss locked", "aria-disabled": "true" },
         h("span", {}, `🔒 Boss: ${island.boss.name}`),
         h("span", { class: "muted" }, "Finish every stage to face the boss"));

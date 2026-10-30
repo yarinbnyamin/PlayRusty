@@ -10,7 +10,7 @@
   --rust-soft: #ff8a4c;
   --sand: #e9d3a6;
   --good: #4cc38a;
-  --bad: #ff7a7a;
+  --bad: #ff9a9a;
   --gold: #f2b632;
   --mono: ui-monospace, "Cascadia Code", "Fira Code", Consolas, monospace;
   --radius: 12px;
@@ -42,8 +42,8 @@ h1 { font-size: 2rem; margin: 0.4em 0; }
 }
 .btn:hover:not(:disabled) { background: var(--card-hover); }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn.primary { background: var(--rust); border-color: var(--rust); color: #fff; }
-.btn.primary:hover:not(:disabled) { background: #ff5f14; }
+.btn.primary { background: #c43d00; border-color: #c43d00; color: #fff; }
+.btn.primary:hover:not(:disabled) { background: #d94400; }
 .btn.danger { border-color: var(--bad); color: var(--bad); }
 .btn.small { padding: 4px 12px; font-size: 0.9rem; }
 .btn.big { font-size: 1.2rem; padding: 14px 28px; }
@@ -111,15 +111,18 @@ a.stage-card:hover { border-color: var(--rust); background: var(--card-hover); }
 .tag.experienced { background: #6b4fbf; }
 .prose code, .prompt code {
   font-family: var(--mono); background: rgba(0, 0, 0, 0.3); padding: 1px 6px; border-radius: 6px; font-size: 0.92em;
+  font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0;
 }
 pre.code {
   font-family: var(--mono); font-size: 0.95rem; background: #08192a; border: 1px solid var(--line);
   border-radius: 10px; padding: 14px 16px; overflow-x: auto; margin: 12px 0; line-height: 1.5;
+  font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0;
 }
 pre.code code { font-family: inherit; }
 .gap {
   font-family: var(--mono); font-size: inherit; background: #fff8e0; color: #1a1a1a;
   border: 2px solid var(--gold); border-radius: 6px; padding: 0 4px; width: 7ch;
+  font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0;
 }
 .choices { display: grid; gap: 10px; }
 .choice {
@@ -131,6 +134,7 @@ pre.code code { font-family: inherit; }
 .lines {
   font-family: var(--mono); background: #08192a; border: 1px solid var(--line);
   border-radius: 10px; padding: 8px 0; margin: 12px 0; overflow-x: auto;
+  font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0;
 }
 .line {
   display: flex; gap: 14px; width: 100%; text-align: left; background: transparent; border: none;
@@ -143,9 +147,11 @@ pre.code code { font-family: inherit; }
 
 .editor { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin: 12px 0; }
 .editor .cm-editor { max-height: 480px; }
+.editor-tip { font-size: 0.85rem; margin: -6px 0 12px; }
 .console pre {
   font-family: var(--mono); font-size: 0.88rem; white-space: pre-wrap; background: #050f19;
   border-radius: 10px; padding: 12px 14px; margin: 8px 0;
+  font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0;
 }
 .console pre.err { color: #ffd2c2; }
 .console-msg.info { color: var(--muted); }

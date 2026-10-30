@@ -22,7 +22,7 @@ as "coming soon".
 
 ## Development
 
-You need Node 22+ and, for checking Rust content, a Rust toolchain with `cargo`.
+You need Node 22.4+ (24 recommended) and, for checking Rust content, a Rust toolchain with `cargo`.
 
 ```bash
 npm install

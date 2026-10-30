@@ -175,6 +175,7 @@ export const variablesIsland: Island = {
           title: "Coming from another language",
           text:
             "Rust's `let` is like `const` in JavaScript or `final` in Java: the variable can't be reassigned. `let mut` is like JavaScript's `let`.\n\n" +
+            "One difference: Rust's immutability is deep. Unlike a JavaScript `const` object or a Java `final` object, you also can't change the value's contents through an immutable variable.\n\n" +
             "Make things mutable only when you need to. The compiler even warns you about a `mut` you never use.",
         },
       ],
@@ -469,7 +470,7 @@ export const variablesIsland: Island = {
           title: "const",
           text:
             "A **constant** is a value that never changes, ever. You create one with `const` instead of `let`.\n\n" +
-            "Constants have three rules: their names use `SCREAMING_SNAKE_CASE`, they **always** need a type annotation, and they can't be `mut`. They can live outside `main`, so the whole program can use them.",
+            "Constants have two hard rules: they **always** need a type annotation, and they can't be `mut`. By convention their names use `SCREAMING_SNAKE_CASE` (the compiler warns if they don't). They can live outside `main`, so the whole program can use them.",
           code: rs`
             const MAX_LIVES: u32 = 3;
 

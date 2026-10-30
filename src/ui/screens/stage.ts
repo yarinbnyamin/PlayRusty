@@ -40,19 +40,31 @@ export function renderStage(root: HTMLElement, ctx: AppContext, islandId: string
     main.replaceChildren(h("a", { class: "back", href: routeToHash({ name: "island", islandId }) }, `← ${island.name}`));
   }
 
+  // Keyboard focus lands on the step line after each re-render, never on <body>.
+  let focusStep: HTMLElement | null = null;
+  function stepLine(text: string): HTMLElement {
+    const step = h("p", { class: "step", tabindex: "-1" }, text);
+    focusStep = step;
+    return step;
+  }
+  function focusStepLine(): void {
+    focusStep?.focus();
+  }
+
   function showPage(index: number): void {
     clear();
     const page = renderTutorialPage(pages[index]);
     cleanups.push(page.destroy);
     const last = index === pages.length - 1;
     main.append(
-      h("p", { class: "step" }, `${stage.title}: lesson ${index + 1} of ${pages.length}`),
+      stepLine(`${stage.title}: lesson ${index + 1} of ${pages.length}`),
       page.el,
       h("div", { class: "row" },
         index > 0 ? h("button", { class: "btn", onclick: () => showPage(index - 1) }, "← Back") : null,
         h("button", { class: "btn primary", onclick: () => (last ? showPuzzle(0) : showPage(index + 1)) },
           last ? "Start the puzzles →" : "Next →")),
     );
+    focusStepLine();
   }
 
   function showPuzzle(index: number): void {
@@ -61,9 +73,10 @@ export function renderStage(root: HTMLElement, ctx: AppContext, islandId: string
     const area = h("div");
     const feedback = h("div", { class: "feedback", "aria-live": "polite" });
     main.append(
-      h("p", { class: "step" }, `${stage.title}: puzzle ${index + 1} of ${stage.puzzles.length}`),
+      stepLine(`${stage.title}: puzzle ${index + 1} of ${stage.puzzles.length}`),
       h("section", { class: "puzzle" }, area, feedback),
     );
+    focusStepLine();
 
     let solved = false;
     let wrongHere = 0;
@@ -101,8 +114,8 @@ export function renderStage(root: HTMLElement, ctx: AppContext, islandId: string
       : { name: "boss", islandId: island.id };
     main.append(
       h("section", { class: "stage-done" },
-        h("h2", {}, `Stage complete: ${stage.title}`),
-        h("p", { class: "stars big", "aria-label": `${starsForMistakes(mistakes)} of 3 stars` }, starsLabel(starsForMistakes(mistakes))),
+        h("h2", { tabindex: "-1" }, `Stage complete: ${stage.title}`),
+        h("p", { class: "stars big", role: "img", "aria-label": `${starsForMistakes(mistakes)} of 3 stars` }, starsLabel(starsForMistakes(mistakes))),
         h("p", {}, mistakes === 0
           ? "Flawless: no mistakes!"
           : `${mistakes} mistake${mistakes === 1 ? "" : "s"}. Replay any time to earn more stars.`),
@@ -111,6 +124,7 @@ export function renderStage(root: HTMLElement, ctx: AppContext, islandId: string
             nextStage ? `Next: ${nextStage.title} →` : `Face the boss: ${island.boss.name} ⚔`),
           h("a", { class: "btn", href: routeToHash({ name: "island", islandId: island.id }) }, "Back to the island"))),
     );
+    main.querySelector<HTMLElement>(".stage-done h2")?.focus();
   }
 
   if (pages.length > 0) showPage(0);

@@ -20,6 +20,7 @@ export function renderTutorialPage(page: TutorialPage): { el: HTMLElement; destr
     button.addEventListener("click", () => {
       button.remove();
       runner = createRunner(el, code);
+      el.querySelector<HTMLButtonElement>(".runner button")?.focus();
     });
     el.append(button);
   }

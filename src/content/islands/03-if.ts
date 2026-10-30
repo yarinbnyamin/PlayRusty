@@ -355,12 +355,12 @@ export const ifIsland: Island = {
           prompt: "Which function compiles?",
           options: [
             { code: rs`
-              fn sign(n: i32) -> i32 {
+              fn step(n: i32) -> i32 {
                   if n >= 0 { 1 }
               }
             `, correct: false },
             { code: rs`
-              fn sign(n: i32) -> i32 {
+              fn step(n: i32) -> i32 {
                   if n >= 0 { 1 } else { -1 }
               }
             `, correct: true },

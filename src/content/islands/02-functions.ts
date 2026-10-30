@@ -290,7 +290,8 @@ export const functionsIsland: Island = {
           title: "Statements and expressions",
           text:
             "Rust separates **expressions**, which produce a value (`n * n`, `5`, `square(3)`), from **statements**, which just do something (`let x = 5;`).\n\n" +
-            "Adding a semicolon turns an expression into a statement and throws its value away. So with `n * n;` the function returns nothing, and the compiler complains about `mismatched types`. This is one of the most common beginner mistakes!",
+            "Adding a semicolon turns an expression into a statement and throws its value away. So with `n * n;` the function returns nothing, and the compiler complains about `mismatched types`. This is one of the most common beginner mistakes!\n\n" +
+            "A function that returns nothing actually returns `()`, Rust's empty \"unit\" value. You'll see `()` in compiler errors like `expected i32, found ()`.",
           code: rs`
             fn square(n: i32) -> i32 {
                 n * n; // error: the semicolon throws the value away
@@ -353,7 +354,7 @@ export const functionsIsland: Island = {
         {
           type: "spotBug",
           id: "return-spot",
-          prompt: "One line causes the compile error. Click it.",
+          prompt: "Which line needs fixing? Click it.",
           code: rs`
             fn main() {
                 let total = add_tax(100);

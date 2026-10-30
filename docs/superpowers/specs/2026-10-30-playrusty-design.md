@@ -77,8 +77,10 @@ doesn't count toward unlocking the boss.
 | `predict` | A code snippet and a question ("What happens?") with 2–4 text choices, e.g. "Doesn't compile", "Prints 5" | The player selects the correct choice |
 | `spotBug` | A code snippet with clickable lines | The player clicks the line marked as the bug (1-based line number) |
 
-On a wrong answer the player sees that puzzle's `explanation` (or `hint` for `fillGap`)
-and may try again. Every wrong attempt counts as a mistake. On a correct answer the
+On a wrong answer the player may try again. `fillGap` shows its `hint` on every wrong
+attempt. `pickFix`, `predict` and `spotBug` show a nudge ("Read the code again carefully
+and try another answer.") on the first wrong attempt and the `explanation` from the
+second wrong attempt on. Every wrong attempt counts as a mistake. On a correct answer the
 `explanation` is shown as a "Why?" note, then **Continue**.
 
 ### 2.6 Boss fights (real compiler)

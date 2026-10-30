@@ -107,8 +107,11 @@ export function renderBoss(root: HTMLElement, ctx: AppContext, islandId: string)
   }
   runButton.addEventListener("click", () => void run());
 
+  window.addEventListener("pagehide", persistCode);
+
   return () => {
     alive = false;
+    window.removeEventListener("pagehide", persistCode);
     persistCode();
     editor.destroy();
   };

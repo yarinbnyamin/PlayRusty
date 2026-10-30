@@ -29,7 +29,7 @@ export function renderCelebrate(root: HTMLElement, ctx: AppContext, islandId: st
     h("main", { class: "celebrate" },
       badgeSvg(island.number),
       h("h1", {}, `${island.boss.name} is defeated!`),
-      h("p", { class: "stars big", "aria-label": `${result.stars} of 3 stars` }, starsLabel(result.stars)),
+      h("p", { class: "stars big", role: "img", "aria-label": `${result.stars} of 3 stars` }, starsLabel(result.stars)),
       h("p", {}, `You earned the ${island.name} badge${xp > 0 ? ` and ${xp} XP` : ""}.`),
       h("p", { class: "muted" }, next
         ? `A new island has appeared on the map: ${next.name}.`
