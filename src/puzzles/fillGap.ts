@@ -12,7 +12,7 @@ export function renderFillGap(puzzle: FillGapPuzzle, container: HTMLElement, onS
   parts.forEach((part, i) => {
     code.append(part);
     if (i < parts.length - 1) {
-      const input = h("input", { class: "gap", type: "text", "aria-label": `Gap ${i + 1}`, autocomplete: "off", spellcheck: "false" });
+      const input = h("input", { class: "gap", type: "text", "aria-label": `Gap ${i + 1}`, autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false" });
       inputs.push(input);
       code.append(input);
     }

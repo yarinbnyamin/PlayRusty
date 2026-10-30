@@ -9,7 +9,7 @@ export function checkPickFix(puzzle: PickFixPuzzle, index: number): boolean {
 export function renderPickFix(puzzle: PickFixPuzzle, container: HTMLElement, onSubmit: (index: number) => void): void {
   const choices = h("div", { class: "choices" });
   puzzle.options.forEach((option, i) => {
-    choices.append(h("button", { class: "choice", "aria-label": `Option ${i + 1}`, onclick: () => onSubmit(i) }, codeBlock(option.code)));
+    choices.append(h("button", { class: "choice", onclick: () => onSubmit(i) }, codeBlock(option.code)));
   });
   container.append(h("p", { class: "prompt" }, puzzle.prompt), choices);
 }

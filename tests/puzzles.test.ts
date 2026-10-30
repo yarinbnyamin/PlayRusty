@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { FillGapPuzzle, PickFixPuzzle, PredictPuzzle, SpotBugPuzzle } from "../src/engine/types";
 import { checkFillGap, renderFillGap } from "../src/puzzles/fillGap";
 import { renderPuzzle } from "../src/puzzles/index";
-import { checkPickFix } from "../src/puzzles/pickFix";
+import { checkPickFix, renderPickFix } from "../src/puzzles/pickFix";
 import { checkPredict } from "../src/puzzles/predict";
 import { checkSpotBug, renderSpotBug } from "../src/puzzles/spotBug";
 
@@ -51,6 +51,28 @@ describe("renderers", () => {
     inputs[1].value = "i32";
     container.querySelector("button")?.click();
     expect(submitted).toEqual(["mut", "i32"]);
+  });
+
+  it("pickFix choice buttons are named by their code, not a generic label", () => {
+    const container = document.createElement("div");
+    renderPickFix(pickFix, container, () => {});
+    const buttons = container.querySelectorAll<HTMLButtonElement>("button.choice");
+    expect(buttons).toHaveLength(2);
+    buttons.forEach((button, i) => {
+      expect(button.hasAttribute("aria-label")).toBe(false);
+      expect(button.textContent).toContain(pickFix.options[i].code);
+    });
+  });
+
+  it("fillGap inputs disable auto-capitalisation and autocorrect", () => {
+    const container = document.createElement("div");
+    renderFillGap(fillGap, container, () => {});
+    const inputs = container.querySelectorAll("input");
+    expect(inputs).toHaveLength(2);
+    inputs.forEach((input) => {
+      expect(input.getAttribute("autocapitalize")).toBe("off");
+      expect(input.getAttribute("autocorrect")).toBe("off");
+    });
   });
 
   it("spotBug renders one button per line and submits the 1-based line", () => {
