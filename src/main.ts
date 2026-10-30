@@ -1,4 +1,40 @@
 import "./styles/main.css";
+import { comingSoon, islands } from "./content/index";
+import { createSaveStore, getBrowserStorage } from "./engine/save";
+import { onRouteChange, type Route } from "./router";
+import { createAppContext, type Cleanup } from "./ui/app";
+import { renderSettings } from "./ui/screens/settings";
+import { renderTitle } from "./ui/screens/title";
 
-const root = document.getElementById("app");
-if (root) root.textContent = "PlayRusty is loading…";
+const rootElement = document.getElementById("app");
+if (!rootElement) throw new Error("Missing #app element");
+const root: HTMLElement = rootElement;
+
+const ctx = createAppContext(createSaveStore(getBrowserStorage()), islands, comingSoon);
+let cleanup: Cleanup | null = null;
+
+function show(route: Route): void {
+  cleanup?.();
+  cleanup = null;
+  root.replaceChildren();
+  window.scrollTo(0, 0);
+
+  if (ctx.getSave().mode === null && route.name !== "title" && route.name !== "settings") {
+    ctx.go({ name: "title" });
+    return;
+  }
+
+  switch (route.name) {
+    case "title":
+      cleanup = renderTitle(root, ctx);
+      break;
+    case "settings":
+      cleanup = renderSettings(root, ctx);
+      break;
+    default:
+      // Screens for the remaining routes are added in later tasks.
+      cleanup = renderTitle(root, ctx);
+  }
+}
+
+onRouteChange(show);
