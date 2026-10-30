@@ -18,6 +18,11 @@ describe("router", () => {
     expect(parseRoute("#/stage/variables")).toEqual({ name: "title" });
   });
 
+  it("falls back to the title screen on malformed percent-escapes", () => {
+    expect(parseRoute("#/island/100%")).toEqual({ name: "title" });
+    expect(parseRoute("#/stage/%E0%A4%A/x")).toEqual({ name: "title" });
+  });
+
   it("round-trips routes through hashes", () => {
     const routes: Route[] = [
       { name: "title" }, { name: "map" }, { name: "settings" },

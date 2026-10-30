@@ -8,7 +8,12 @@ export type Route =
   | { name: "celebrate"; islandId: string };
 
 export function parseRoute(hash: string): Route {
-  const parts = hash.replace(/^#\/?/, "").split("/").filter(Boolean).map(decodeURIComponent);
+  let parts: string[];
+  try {
+    parts = hash.replace(/^#\/?/, "").split("/").filter(Boolean).map(decodeURIComponent);
+  } catch {
+    return { name: "title" }; // malformed percent-escape
+  }
   const [name = "", a = "", b = ""] = parts;
   switch (name) {
     case "map":
