@@ -1,4 +1,5 @@
 import "./styles/main.css";
+import { createMusic } from "./audio/music";
 import { comingSoon, islands } from "./content/index";
 import { createSaveStore, getBrowserStorage } from "./engine/save";
 import { onRouteChange, type Route } from "./router";
@@ -15,7 +16,9 @@ const rootElement = document.getElementById("app");
 if (!rootElement) throw new Error("Missing #app element");
 const root: HTMLElement = rootElement;
 
-const ctx = createAppContext(createSaveStore(getBrowserStorage()), islands, comingSoon);
+const storage = getBrowserStorage();
+const music = createMusic(storage);
+const ctx = createAppContext(createSaveStore(storage), islands, comingSoon, music);
 let cleanup: Cleanup | null = null;
 
 function show(route: Route): void {
@@ -23,6 +26,7 @@ function show(route: Route): void {
   cleanup = null;
   root.replaceChildren();
   window.scrollTo(0, 0);
+  music.setTheme(route.name === "boss" ? "boss" : "calm");
 
   if (ctx.getSave().mode === null && route.name !== "title" && route.name !== "settings") {
     ctx.go({ name: "title" });

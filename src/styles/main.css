@@ -179,3 +179,6 @@ pre.code code { font-family: inherit; }
   .stats { margin-left: 0; }
   .tutorial-page, .puzzle, .stage-done { padding: 16px; }
 }
+.music-toggle[aria-pressed="false"] { opacity: 0.55; text-decoration: line-through; }
+.volume { display: flex; gap: 12px; align-items: center; padding: 6px 0; }
+.volume input { flex: 1; max-width: 240px; accent-color: var(--rust); }
