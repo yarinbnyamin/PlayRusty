@@ -5,11 +5,11 @@ import { renderHud } from "../components/hud";
 import { starsLabel } from "../components/stars";
 import { h } from "../dom";
 
-let xpFromLastWin = 0;
+let lastWin = { xp: 0, jumped: false };
 
 /** Called by the boss screen right before navigating here. */
-export function noteBossXp(xp: number): void {
-  xpFromLastWin = xp;
+export function noteBossWin(xp: number, jumped: boolean): void {
+  lastWin = { xp, jumped };
 }
 
 export function renderCelebrate(root: HTMLElement, ctx: AppContext, islandId: string): Cleanup {
@@ -21,8 +21,8 @@ export function renderCelebrate(root: HTMLElement, ctx: AppContext, islandId: st
     return noop;
   }
   const next = ctx.islands[ctx.islands.indexOf(island) + 1];
-  const xp = xpFromLastWin;
-  xpFromLastWin = 0;
+  const { xp, jumped } = lastWin;
+  lastWin = { xp: 0, jumped: false };
 
   root.append(
     renderHud(ctx),
@@ -31,6 +31,9 @@ export function renderCelebrate(root: HTMLElement, ctx: AppContext, islandId: st
       h("h1", {}, `${island.boss.name} is defeated!`),
       h("p", { class: "stars big", role: "img", "aria-label": `${result.stars} of 3 stars` }, starsLabel(result.stars)),
       h("p", {}, `You earned the ${island.name} badge${xp > 0 ? ` and ${xp} XP` : ""}.`),
+      jumped
+        ? h("p", {}, `You jumped ahead! Every island up to ${island.name} is open now, and the lessons you skipped are waiting for XP and stars.`)
+        : null,
       h("p", { class: "muted" }, next
         ? `A new island has appeared on the map: ${next.name}.`
         : "You've beaten every island built so far. More are on the way. Thanks for playing!"),

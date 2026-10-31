@@ -79,10 +79,11 @@ h1 { font-size: 2rem; margin: 0.4em 0; }
 .island-node .num { font-size: 22px; }
 .island-node .name { font-size: 14px; }
 .island-node .topic { font-size: 12px; font-weight: 500; fill: var(--sand); }
-.island-node.open, .island-node.done { cursor: pointer; }
+.island-node.open, .island-node.done, .island-node.locked { cursor: pointer; }
 .island-node.open:hover .land { fill: #3a9a62; }
 .island-node.done .land { fill: #2a6b8a; }
 .island-node.locked .land { fill: #4b5560; stroke: #7c8791; }
+.island-node.locked:hover .land { fill: #5b6670; }
 .island-node.soon .land { fill: #1d3d52; stroke: #4a6b80; stroke-dasharray: 10 8; }
 .island-node.soon text { fill: #8fa9b8; }
 .island-node:focus { outline: none; }
@@ -99,6 +100,9 @@ h1 { font-size: 2rem; margin: 0.4em 0; }
 a.stage-card:hover { border-color: var(--rust); background: var(--card-hover); }
 .stage-card.locked { opacity: 0.6; }
 .stage-card.boss { margin-top: 18px; border-color: var(--rust); }
+.stage-card.jump { border-style: dashed; border-color: var(--gold); }
+.skip-note { margin-top: 8px; }
+.jump-notice { color: var(--gold); font-weight: 600; }
 .stars { color: var(--gold); letter-spacing: 2px; }
 .stars.big { font-size: 2.4rem; margin: 8px 0; }
 

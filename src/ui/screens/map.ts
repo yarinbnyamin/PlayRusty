@@ -62,11 +62,12 @@ export function renderMap(root: HTMLElement, ctx: AppContext): Cleanup {
       svgText("name", 10, entry.name),
       svgText("topic", 30, topicText),
     );
-    if (island && unlocked) {
+    if (island) {
       const open = () => ctx.go({ name: "island", islandId: island.id });
       node.setAttribute("tabindex", "0");
       node.setAttribute("role", "link");
-      node.setAttribute("aria-label", `Island ${entry.number}: ${entry.name}, ${entry.topic}${done ? ", completed" : ""}`);
+      node.setAttribute("aria-label",
+        `Island ${entry.number}: ${entry.name}, ${entry.topic}${done ? ", completed" : ""}${unlocked ? "" : ", locked: jump challenge available"}`);
       node.addEventListener("click", open);
       node.addEventListener("keydown", (event) => {
         if (event.key === "Enter" || event.key === " ") {

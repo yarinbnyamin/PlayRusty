@@ -1,4 +1,4 @@
-import { isBossUnlocked, recordBossDefeated } from "../../engine/progress";
+import { isJumpChallenge, recordBossDefeated } from "../../engine/progress";
 import type { Island } from "../../engine/types";
 import { buildBossProgram, countTests } from "../../playground/bossProgram";
 import { runCode } from "../../playground/client";
@@ -11,7 +11,7 @@ import { createHpBar } from "../components/hpBar";
 import { renderHud } from "../components/hud";
 import { h } from "../dom";
 import { prose } from "../markdown";
-import { noteBossXp } from "./celebrate";
+import { noteBossWin } from "./celebrate";
 
 export function renderBoss(root: HTMLElement, ctx: AppContext, islandId: string): Cleanup {
   const save = ctx.getSave();
@@ -20,11 +20,8 @@ export function renderBoss(root: HTMLElement, ctx: AppContext, islandId: string)
     ctx.go({ name: "map" });
     return noop;
   }
-  if (!isBossUnlocked(ctx.islands, islandId, save)) {
-    ctx.go({ name: "island", islandId });
-    return noop;
-  }
   const island: Island = foundIsland;
+  const jump = isJumpChallenge(ctx.islands, islandId, save);
   const boss = island.boss;
   const total = countTests(boss.tests);
   let hintsUsed = 0;
@@ -36,6 +33,7 @@ export function renderBoss(root: HTMLElement, ctx: AppContext, islandId: string)
     h("a", { class: "back", href: routeToHash({ name: "island", islandId }) }, `← ${island.name}`),
     h("h1", {}, `⚔ ${boss.name}`),
     prose(boss.story),
+    ...(jump ? [h("p", { class: "jump-notice" }, `Jump challenge: beat this boss to unlock every island up to ${island.name}.`)] : []),
     h("p", { class: "muted" }, "Fix the code below. When you press Run, hidden tests attack the boss: every passing test is a hit."),
   );
   const hp = createHpBar(main, boss.name, total);
@@ -96,7 +94,7 @@ export function renderBoss(root: HTMLElement, ctx: AppContext, islandId: string)
     if (report.failed.length === 0 && report.passed.length === total) {
       const xpBefore = ctx.getSave().xp;
       ctx.update((s) => recordBossDefeated(s, island.id, hintsUsed));
-      noteBossXp(ctx.getSave().xp - xpBefore);
+      noteBossWin(ctx.getSave().xp - xpBefore, jump);
       ctx.go({ name: "celebrate", islandId: island.id });
       return;
     }

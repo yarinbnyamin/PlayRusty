@@ -31,7 +31,13 @@ export function isIslandUnlocked(islands: Island[], islandId: string, save: Save
   const index = islands.findIndex((island) => island.id === islandId);
   if (index < 0) return false;
   if (index === 0) return true;
-  return isBossDefeated(save, islands[index - 1].id);
+  // The previous boss, this island's boss, or any later boss (beaten by jumping ahead) opens it.
+  return islands.slice(index - 1).some((island) => isBossDefeated(save, island.id));
+}
+
+/** True when the island exists but is locked: beating its boss is a jump ahead. */
+export function isJumpChallenge(islands: Island[], islandId: string, save: SaveData): boolean {
+  return islands.some((island) => island.id === islandId) && !isIslandUnlocked(islands, islandId, save);
 }
 
 export function isStageUnlocked(islands: Island[], islandId: string, stageId: string, save: SaveData): boolean {
@@ -41,20 +47,18 @@ export function isStageUnlocked(islands: Island[], islandId: string, stageId: st
   const stages = visibleStages(island, modeOf(save));
   const index = stages.findIndex((stage) => stage.id === stageId);
   if (index < 0) return false;
+  if (isBossDefeated(save, islandId)) return true;
   return stages.slice(0, index).every((stage) => isStageComplete(save, islandId, stage.id));
 }
 
-export function isBossUnlocked(islands: Island[], islandId: string, save: SaveData): boolean {
-  const island = islands.find((i) => i.id === islandId);
-  if (!island || !isIslandUnlocked(islands, islandId, save)) return false;
-  if (isBossDefeated(save, islandId)) return true;
-  return visibleStages(island, modeOf(save)).every((stage) => isStageComplete(save, islandId, stage.id));
-}
-
-/** The island Ferris stands on: the first unlocked, undefeated island, else the last one. */
+/** The island Ferris stands on: the one after the furthest defeated boss, else the first. */
 export function currentIslandId(islands: Island[], save: SaveData): string | null {
-  const next = islands.find((island) => isIslandUnlocked(islands, island.id, save) && !isBossDefeated(save, island.id));
-  return next?.id ?? islands.at(-1)?.id ?? null;
+  if (islands.length === 0) return null;
+  let furthest = -1;
+  islands.forEach((island, index) => {
+    if (isBossDefeated(save, island.id)) furthest = index;
+  });
+  return islands[Math.min(furthest + 1, islands.length - 1)].id;
 }
 
 export function starsForMistakes(mistakes: number): Stars {

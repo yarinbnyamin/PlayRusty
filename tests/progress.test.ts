@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  XP_PER_BOSS, XP_PER_PUZZLE, currentIslandId, isBossUnlocked, isIslandUnlocked, isStageUnlocked,
+  XP_PER_BOSS, XP_PER_PUZZLE, currentIslandId, isIslandUnlocked, isJumpChallenge, isStageUnlocked,
   recordBossDefeated, recordPuzzleSolved, recordStageComplete, starsForHints, starsForMistakes,
   totalStars, visiblePages, visibleStages,
 } from "../src/engine/progress";
@@ -62,13 +62,27 @@ describe("unlocking", () => {
     expect(isStageUnlocked(islands, "a", "s1", save)).toBe(true);
   });
 
-  it("unlocks the boss when every visible stage is complete", () => {
-    let save = emptySave("experienced");
-    expect(isBossUnlocked(islands, "a", save)).toBe(false);
-    save = recordStageComplete(save, "a", "s1", 0);
-    save = recordStageComplete(save, "a", "s2", 0);
-    expect(isBossUnlocked(islands, "a", save)).toBe(true);
-    expect(isBossUnlocked(islands, "a", { ...save, mode: "beginner" })).toBe(false);
+  it("unlocks every island up to and after a boss beaten by jumping ahead", () => {
+    const four = [islandA, islandB, makeIsland("c"), makeIsland("d")];
+    const save = recordBossDefeated(emptySave(), "c", 0);
+    expect(isIslandUnlocked(four, "a", save)).toBe(true);
+    expect(isIslandUnlocked(four, "b", save)).toBe(true);
+    expect(isIslandUnlocked(four, "c", save)).toBe(true);
+    expect(isIslandUnlocked(four, "d", save)).toBe(true);
+  });
+
+  it("marks the bosses of locked islands as jump challenges", () => {
+    const save = emptySave();
+    expect(isJumpChallenge(islands, "a", save)).toBe(false);
+    expect(isJumpChallenge(islands, "b", save)).toBe(true);
+    expect(isJumpChallenge(islands, "b", recordBossDefeated(save, "a", 0))).toBe(false);
+    expect(isJumpChallenge(islands, "nope", save)).toBe(false);
+  });
+
+  it("opens every stage once the island's boss is beaten", () => {
+    const save = recordBossDefeated(emptySave("beginner"), "a", 0);
+    expect(isStageUnlocked(islands, "a", "s2", save)).toBe(true);
+    expect(isStageUnlocked(islands, "a", "nope", save)).toBe(false);
   });
 
   it("finds the island Ferris should stand on", () => {
@@ -77,6 +91,8 @@ describe("unlocking", () => {
     const afterA = recordBossDefeated(save, "a", 0);
     expect(currentIslandId(islands, afterA)).toBe("b");
     expect(currentIslandId(islands, recordBossDefeated(afterA, "b", 0))).toBe("b");
+    const three = [islandA, islandB, makeIsland("c")];
+    expect(currentIslandId(three, recordBossDefeated(save, "b", 0))).toBe("c");
     expect(currentIslandId([], save)).toBeNull();
   });
 });
