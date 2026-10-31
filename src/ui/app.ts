@@ -1,6 +1,6 @@
 import type { ComingSoonIsland, Island, SaveData } from "../engine/types";
 import type { SaveStore } from "../engine/save";
-import { createMusic, type MusicController } from "../audio/music";
+import { silentMusic, type MusicController } from "../audio/music";
 import { routeToHash, type Route } from "../router";
 
 export type Cleanup = () => void;
@@ -19,7 +19,7 @@ export interface AppContext {
   go(route: Route): void;
 }
 
-export function createAppContext(store: SaveStore, islands: Island[], comingSoon: ComingSoonIsland[], music: MusicController = createMusic(null)): AppContext {
+export function createAppContext(store: SaveStore, islands: Island[], comingSoon: ComingSoonIsland[], music: MusicController = silentMusic()): AppContext {
   let save = store.load();
   return {
     islands,

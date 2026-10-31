@@ -10,6 +10,11 @@ function musicToggle(ctx: AppContext): HTMLButtonElement {
     button.setAttribute("aria-pressed", String(ctx.music.enabled));
     button.title = ctx.music.enabled ? "Music on" : "Music off";
   };
+  // Follows changes made elsewhere (the Settings checkbox); lets go once its screen has been replaced.
+  const unsubscribe = ctx.music.onChange(() => {
+    if (!button.isConnected) unsubscribe();
+    else sync();
+  });
   button.addEventListener("click", () => {
     ctx.music.setEnabled(!ctx.music.enabled);
     sync();

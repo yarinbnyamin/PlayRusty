@@ -70,7 +70,7 @@ h1 { font-size: 2rem; margin: 0.4em 0; }
 .title-actions { display: flex; justify-content: center; gap: 12px; margin-top: 32px; flex-wrap: wrap; }
 
 .settings fieldset { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 18px; }
-.radio { display: flex; gap: 10px; align-items: center; padding: 6px 0; cursor: pointer; }
+.radio, .check { display: flex; gap: 10px; align-items: center; padding: 6px 0; cursor: pointer; }
 
 .map-svg { width: 100%; height: auto; display: block; }
 .route { fill: none; stroke: var(--sand); stroke-width: 4; stroke-dasharray: 2 14; stroke-linecap: round; opacity: 0.6; }
@@ -179,6 +179,11 @@ pre.code code { font-family: inherit; }
   .stats { margin-left: 0; }
   .tutorial-page, .puzzle, .stage-done { padding: 16px; }
 }
-.music-toggle[aria-pressed="false"] { opacity: 0.55; text-decoration: line-through; }
+.music-toggle { position: relative; }
+.music-toggle[aria-pressed="false"] { border-style: dashed; color: var(--muted); }
+.music-toggle[aria-pressed="false"]::after {
+  content: ""; position: absolute; left: 20%; right: 20%; top: 50%;
+  border-top: 2px solid currentColor; transform: rotate(-35deg);
+}
 .volume { display: flex; gap: 12px; align-items: center; padding: 6px 0; }
 .volume input { flex: 1; max-width: 240px; accent-color: var(--rust); }

@@ -1,6 +1,6 @@
 import type { Mode } from "../../engine/types";
 import { routeToHash } from "../../router";
-import { noop, type AppContext, type Cleanup } from "../app";
+import type { AppContext, Cleanup } from "../app";
 import { renderHud } from "../components/hud";
 import { h } from "../dom";
 import { prose } from "../markdown";
@@ -36,6 +36,15 @@ export function renderSettings(root: HTMLElement, ctx: AppContext): Cleanup {
     oninput: (event: Event) => ctx.music.setVolume(Number((event.target as HTMLInputElement).value) / 100),
   });
 
+  const syncMusic = () => {
+    const percent = Math.round(ctx.music.volume * 100);
+    musicBox.checked = ctx.music.enabled;
+    if (Number(volume.value) !== percent) volume.value = String(percent);
+    volume.setAttribute("aria-valuetext", `${percent}%`);
+  };
+  syncMusic();
+  const unsubscribe = ctx.music.onChange(syncMusic);
+
   root.append(
     renderHud(ctx),
     h("main", { class: "settings" },
@@ -46,11 +55,11 @@ export function renderSettings(root: HTMLElement, ctx: AppContext): Cleanup {
         modeOption("experienced", "I already know another language")),
       h("section", {},
         h("h2", {}, "Sound"),
-        h("label", { class: "radio" }, musicBox, "Play music"),
+        h("label", { class: "check" }, musicBox, "Play music"),
         h("label", { class: "volume" }, "Music volume", volume)),
       h("section", {}, h("h2", {}, "Progress"), h("button", { class: "btn danger", onclick: reset }, "Reset progress")),
       h("section", {}, h("h2", {}, "Credits"), prose(CREDITS)),
       h("a", { class: "btn", href: routeToHash({ name: "map" }) }, "Back to the map")),
   );
-  return noop;
+  return unsubscribe;
 }
