@@ -21,6 +21,7 @@ Each boss tests almost everything its island teaches, so beating a boss is accep
 - **Island screen, locked island:** no longer redirects to the map. It shows the stage list, all locked, and a boss card "⚡ Jump here: beat {boss name}" with the line "Win to unlock every island up to here. You can still play the lessons you skip."
 - **Map:** locked real islands are clickable and keyboard-focusable like open ones and lead to their island screen. Their accessible name ends with ", locked: jump challenge available". "Coming soon" islands stay inert.
 - **Boss screen:** no unlock guard beyond "the island exists". On a jump challenge it shows a notice under the story: "Jump challenge: beat this boss to unlock every island up to {island name}."
+- **Celebrate screen, next-island line:** the boss screen records which islands this win newly unlocked and passes them with the XP note. "A new island has appeared on the map: {next}." (button "Sail on to {next} ⛵") shows only when the next island was newly unlocked by this win. When every island's boss is defeated it shows the existing finale line. Otherwise it shows "There's still a boss waiting on {name}." where {name} is the first island whose boss is undefeated, with the button "Sail on to {name} ⛵" linking to that island.
 - **Celebrate screen:** after a jump win it adds "You jumped ahead! Every island up to {island name} is open now, and the lessons you skipped are waiting for XP and stars." The boss screen tells the celebrate screen this the same way it passes the XP earned (a module-level note).
 
 ## 2. Soundtrack
@@ -36,7 +37,7 @@ Each boss tests almost everything its island teaches, so beating a boss is accep
 ### 2.2 Controls and preferences
 
 - Preferences live in localStorage key `playrusty.audio` as `{ "enabled": boolean, "volume": number }` with volume in 0..1. Defaults: enabled `true`, volume `0.5`. They are separate from the save, so "Reset progress" does not touch them. Reads and writes are wrapped in try/catch; bad or missing data falls back to the defaults.
-- **HUD:** a "♪" toggle button next to Settings, `aria-label="Music"`, `aria-pressed` reflecting the state, title "Music on" / "Music off".
+- **HUD:** a "♪" toggle button next to Settings (the same toggle also sits in the top corner of the title screen, which has no HUD), `aria-label="Music"`, `aria-pressed` reflecting the state, title "Music on" / "Music off".
 - **Settings:** a "Sound" section with a "Play music" checkbox and a "Music volume" range input (0–100).
 - **Credits** add: "The music is generated live in your browser by PlayRusty's own code, so it is free of copyright."
 
