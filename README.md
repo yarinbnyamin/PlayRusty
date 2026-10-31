@@ -7,6 +7,12 @@ compiled by the real Rust compiler.
 
 **Play it:** https://yarinbnyamin.github.io/PlayRusty/
 
+> 🙏 **Built on rustlings.** PlayRusty is a gamified take on
+> [rustlings](https://github.com/rust-lang/rustlings), the Rust community's small exercises for learning to
+> read and write Rust. Its curriculum, topic order and exercise style are the backbone of this game. All
+> credit for that path goes to the rustlings team and contributors. If you enjoy PlayRusty, go star and use
+> rustlings too.
+
 ## Features
 
 - **Two learner modes.** New to programming? You get the general basics too. Already know another language?
@@ -50,7 +56,8 @@ and publishes to GitHub Pages. In the repository's **Settings → Pages**, set *
 
 ## Credits
 
-- Curriculum: [rustlings](https://github.com/rust-lang/rustlings) by the Rust community (MIT).
+- Curriculum: [rustlings](https://github.com/rust-lang/rustlings) by the rustlings team and contributors
+  (MIT). PlayRusty follows its topics in the same order and turns them into islands, puzzles and bosses.
 - Compiler: the official [Rust Playground](https://play.rust-lang.org).
 - Ferris the crab is the unofficial Rust mascot, released into the public domain by Karen Rustad Tölva.
   PlayRusty's Ferris is an original drawing in that spirit.
