@@ -5,7 +5,7 @@ same path as [rustlings](https://github.com/rust-lang/rustlings): sail an archip
 learn one concept per island, solve puzzles, and defeat each island's boss by fixing real Rust code that's
 compiled by the real Rust compiler.
 
-**Play it:** https://YOUR-GITHUB-USERNAME.github.io/PlayRusty/
+**Play it:** https://yarinbnyamin.github.io/PlayRusty/
 
 ## Features
 
