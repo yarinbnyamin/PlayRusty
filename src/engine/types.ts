@@ -108,6 +108,6 @@ export interface SaveData {
   bosses: Record<string, { stars: Stars }>;
   /** "islandId/stageId/puzzleId" entries, so XP is only awarded once. */
   solvedPuzzles: string[];
-  /** Player's last boss code, keyed by islandId. */
+  /** Unused since rolling boss fights; kept so old saves still load. */
   bossCode: Record<string, string>;
 }
