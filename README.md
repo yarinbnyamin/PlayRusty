@@ -67,13 +67,13 @@ each task before the next one started, then reviewed the whole branch at the end
 
 | | |
 |---|---|
-| Active build time | about 2.7 hours (13 hours wall clock, including breaks) |
-| Output tokens | about 834,000 in total |
-| Claude Opus 5.5 (lead and reviewer) | about 587,000 output tokens |
-| Claude Sonnet 5.5 (sub-agent implementers) | about 247,000 output tokens |
+| Active build time | about 3 hours (25 hours wall clock, including breaks) |
+| Output tokens | about 951,000 in total |
+| Claude Opus 5.5 (lead and reviewer) | about 682,000 output tokens |
+| Claude Sonnet 5.5 (sub-agent implementers) | about 269,000 output tokens |
 
 Active time counts only stretches with no gap over 15 minutes. The token counts come from the session
-transcripts and cover the original game plus the skip-ahead and soundtrack features.
+transcripts and cover the original game plus the skip-ahead, soundtrack and rolling boss fight features.
 
 ## Credits
 
