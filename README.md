@@ -22,6 +22,10 @@ compiled by the real Rust compiler.
 - **Four puzzle types:** fill the gap, pick the fix, predict the output, spot the bug.
 - **Boss fights on the real compiler.** Hidden `#[test]`s hit the boss; read real compiler errors to win.
 - **XP, stars and badges**, saved in your browser. No account needed.
+- **Skip ahead like Duolingo.** Already know a topic? Fight the island's boss straight away, or jump to a
+  locked island by beating its boss. Lessons you skip stay open for XP and stars.
+- **Copyright-free soundtrack.** Calm music on the map and a tenser theme in boss fights, synthesised live
+  in your browser with Web Audio. Mute with ♪ or set the volume in Settings.
 
 Islands 1–3 (Variables, Functions, If) are playable now; the rest of the rustlings topics are on the map
 as "coming soon".
@@ -53,6 +57,23 @@ npm run build        # static site in dist/
 Pushing to `main` runs `.github/workflows/deploy.yml`, which tests, verifies the Rust content, builds,
 and publishes to GitHub Pages. In the repository's **Settings → Pages**, set **Source** to
 **GitHub Actions** once. The repository must be named `PlayRusty` to match the Vite `base`.
+
+## How this was built
+
+PlayRusty was built with [Claude Code](https://claude.com/claude-code) in one session over October 30–31, 2026.
+**Claude Opus 5.5** led the work: it designed the game with the author, wrote the spec and plans, and
+reviewed every task. **Claude Sonnet 5.5** sub-agents wrote the code, one task at a time. Opus reviewed
+each task before the next one started, then reviewed the whole branch at the end.
+
+| | |
+|---|---|
+| Active build time | about 2.7 hours (13 hours wall clock, including breaks) |
+| Output tokens | about 834,000 in total |
+| Claude Opus 5.5 (lead and reviewer) | about 587,000 output tokens |
+| Claude Sonnet 5.5 (sub-agent implementers) | about 247,000 output tokens |
+
+Active time counts only stretches with no gap over 15 minutes. The token counts come from the session
+transcripts and cover the original game plus the skip-ahead and soundtrack features.
 
 ## Credits
 
