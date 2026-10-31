@@ -34,3 +34,16 @@ export function makeIsland(id: string, stages: Stage[] = [makeStage("s1"), makeS
 export function emptySave(mode: Mode | null = "beginner"): SaveData {
   return { version: 1, mode, xp: 0, stages: {}, bosses: {}, solvedPuzzles: [], bossCode: {} };
 }
+
+/** A minimal in-memory Storage for tests. */
+export function memoryStorage(initial: Record<string, string> = {}): Storage {
+  const data = new Map(Object.entries(initial));
+  return {
+    get length() { return data.size; },
+    clear: () => data.clear(),
+    getItem: (key) => data.get(key) ?? null,
+    key: (index) => [...data.keys()][index] ?? null,
+    removeItem: (key) => { data.delete(key); },
+    setItem: (key, value) => { data.set(key, String(value)); },
+  };
+}
