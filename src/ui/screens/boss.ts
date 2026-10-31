@@ -1,4 +1,4 @@
-import { isJumpChallenge, recordBossDefeated } from "../../engine/progress";
+import { isIslandUnlocked, isJumpChallenge, recordBossDefeated } from "../../engine/progress";
 import type { Island } from "../../engine/types";
 import { buildBossProgram, countTests } from "../../playground/bossProgram";
 import { runCode } from "../../playground/client";
@@ -92,9 +92,14 @@ export function renderBoss(root: HTMLElement, ctx: AppContext, islandId: string)
     }
     hp.set(total - report.passed.length);
     if (report.failed.length === 0 && report.passed.length === total) {
-      const xpBefore = ctx.getSave().xp;
+      const before = ctx.getSave();
+      const wasOpen = new Set(ctx.islands.filter((i) => isIslandUnlocked(ctx.islands, i.id, before)).map((i) => i.id));
       ctx.update((s) => recordBossDefeated(s, island.id, hintsUsed));
-      noteBossWin(ctx.getSave().xp - xpBefore, jump);
+      const after = ctx.getSave();
+      const newlyOpened = ctx.islands
+        .filter((i) => !wasOpen.has(i.id) && isIslandUnlocked(ctx.islands, i.id, after))
+        .map((i) => i.id);
+      noteBossWin(after.xp - before.xp, jump, newlyOpened);
       ctx.go({ name: "celebrate", islandId: island.id });
       return;
     }

@@ -56,7 +56,8 @@ h1 { font-size: 2rem; margin: 0.4em 0; }
 .stats { display: flex; gap: 16px; margin-left: auto; font-weight: 600; }
 .notice { width: 100%; margin: 0; color: var(--gold); font-size: 0.9rem; }
 
-.title-screen { text-align: center; padding-top: 48px; }
+.title-screen { position: relative; text-align: center; padding-top: 48px; }
+.title-corner { position: absolute; top: 12px; right: 16px; }
 .title-screen h1 { font-size: 3.2rem; margin: 0.2em 0 0; color: var(--rust-soft); }
 .tagline { font-size: 1.2rem; color: var(--muted); }
 .mode-pick { display: grid; gap: 14px; max-width: 520px; margin: 32px auto 0; }

@@ -4,7 +4,7 @@ import type { AppContext } from "../app";
 import { h } from "../dom";
 import { ferrisSvg } from "./ferris";
 
-function musicToggle(ctx: AppContext): HTMLButtonElement {
+export function musicToggle(ctx: AppContext): HTMLButtonElement {
   const button = h("button", { class: "btn small music-toggle", type: "button", "aria-label": "Music" }, "♪");
   const sync = () => {
     button.setAttribute("aria-pressed", String(ctx.music.enabled));

@@ -5,11 +5,11 @@ import { renderHud } from "../components/hud";
 import { starsLabel } from "../components/stars";
 import { h } from "../dom";
 
-let lastWin = { xp: 0, jumped: false };
+let lastWin: { xp: number; jumped: boolean; newlyOpened: string[] } = { xp: 0, jumped: false, newlyOpened: [] };
 
 /** Called by the boss screen right before navigating here. */
-export function noteBossWin(xp: number, jumped: boolean): void {
-  lastWin = { xp, jumped };
+export function noteBossWin(xp: number, jumped: boolean, newlyOpened: string[]): void {
+  lastWin = { xp, jumped, newlyOpened };
 }
 
 export function renderCelebrate(root: HTMLElement, ctx: AppContext, islandId: string): Cleanup {
@@ -21,8 +21,15 @@ export function renderCelebrate(root: HTMLElement, ctx: AppContext, islandId: st
     return noop;
   }
   const next = ctx.islands[ctx.islands.indexOf(island) + 1];
-  const { xp, jumped } = lastWin;
-  lastWin = { xp: 0, jumped: false };
+  const { xp, jumped, newlyOpened } = lastWin;
+  lastWin = { xp: 0, jumped: false, newlyOpened: [] };
+  const waiting = ctx.islands.find((i) => !save.bosses[i.id]);
+  const announcesNext = next !== undefined && newlyOpened.includes(next.id);
+  const nextLine = announcesNext
+    ? `A new island has appeared on the map: ${next.name}.`
+    : waiting
+      ? `There's still a boss waiting on ${waiting.name}.`
+      : "You've beaten every island built so far. More are on the way. Thanks for playing!";
 
   root.append(
     renderHud(ctx),
@@ -34,11 +41,13 @@ export function renderCelebrate(root: HTMLElement, ctx: AppContext, islandId: st
       jumped
         ? h("p", {}, `You jumped ahead! Every island up to ${island.name} is open now, and the lessons you skipped are waiting for XP and stars.`)
         : null,
-      h("p", { class: "muted" }, next
-        ? `A new island has appeared on the map: ${next.name}.`
-        : "You've beaten every island built so far. More are on the way. Thanks for playing!"),
+      h("p", { class: "muted" }, nextLine),
       h("div", { class: "row" },
-        h("a", { class: "btn primary", href: routeToHash({ name: "map" }) }, next ? `Sail on to ${next.name} ⛵` : "Back to the map"),
+        announcesNext
+          ? h("a", { class: "btn primary", href: routeToHash({ name: "map" }) }, `Sail on to ${next.name} ⛵`)
+          : waiting
+            ? h("a", { class: "btn primary", href: routeToHash({ name: "island", islandId: waiting.id }) }, `Sail on to ${waiting.name} ⛵`)
+            : h("a", { class: "btn primary", href: routeToHash({ name: "map" }) }, "Back to the map"),
         h("a", { class: "btn", href: routeToHash({ name: "island", islandId: island.id }) }, `Revisit ${island.name}`))),
   );
   return noop;

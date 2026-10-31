@@ -2,6 +2,7 @@ import type { Mode } from "../../engine/types";
 import { routeToHash } from "../../router";
 import { noop, type AppContext, type Cleanup } from "../app";
 import { ferrisSvg } from "../components/ferris";
+import { musicToggle } from "../components/hud";
 import { h } from "../dom";
 
 export function renderTitle(root: HTMLElement, ctx: AppContext): Cleanup {
@@ -28,6 +29,7 @@ export function renderTitle(root: HTMLElement, ctx: AppContext): Cleanup {
 
   root.append(
     h("main", { class: "title-screen" },
+      h("div", { class: "title-corner" }, musicToggle(ctx)),
       ferrisSvg(160),
       h("h1", {}, "PlayRusty"),
       h("p", { class: "tagline" }, "Learn Rust by sailing an archipelago of puzzles with Ferris the crab."),
