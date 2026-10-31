@@ -8,7 +8,7 @@ Each boss tests almost everything its island teaches, so beating a boss is accep
 
 ### 1.1 Rules (pure functions in `src/engine/progress.ts`)
 
-- **Island unlocked:** the first island, or the previous island's boss is defeated, **or any later island's boss is defeated** (the player jumped past it).
+- **Island unlocked:** the first island, or the previous island's boss is defeated, **or this island's or any later island's boss is defeated** (the player jumped to or past it).
 - **Boss fightable:** every real island's boss can be fought at any time. There is no "finish every stage first" gate any more. `isBossUnlocked` is removed.
 - **Jump challenge:** `isJumpChallenge(islands, islandId, save)` is true when the island exists and is not unlocked. Fighting that boss is a "jump".
 - **Stage unlocked:** the island is unlocked and either the stage is complete, all earlier visible stages are complete (unchanged), **or the island's boss is defeated** (then every stage is open, in any order).
@@ -58,5 +58,5 @@ Each boss tests almost everything its island teaches, so beating a boss is accep
 
 - `tests/progress.test.ts`: the new unlock, jump-challenge, stage-unlock-after-boss and `currentIslandId` rules, replacing the old boss-gate test.
 - Screen tests (jsdom): a locked island renders its jump card instead of redirecting; the boss card on an unlocked island is a link from the start; the HUD toggle flips `aria-pressed` and the stored preference; the Settings controls update preferences.
-- `tests/audio.test.ts`: preference defaults, clamping and corrupt data; `eventsForBar` is deterministic, every pitched note is in its theme's scale, and the boss theme is busier than the calm one; `createMusic` without `AudioContext` does not throw.
+- `tests/audio.test.ts`: preference defaults, clamping and corrupt data; `eventsForBar` is deterministic, melody notes (and every boss-theme pitch) are in the theme's scale, and the boss theme is busier than the calm one; `createMusic` without `AudioContext` does not throw.
 - Manual: listen to both themes and the cross-fade in a real browser; check mute, volume, tab-hide pause, and a jump from island 1 to island 3.
