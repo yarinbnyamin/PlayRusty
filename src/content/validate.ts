@@ -25,11 +25,17 @@ export function validateIsland(island: Island): string[] {
     validateStage(stage, (message) => report(`/${stage.id}`, message));
   }
 
-  const boss = island.boss;
-  if (!boss.starter.trim()) report("/boss", "starter is empty");
-  if (!boss.solution.trim()) report("/boss", "solution is empty");
-  if (!boss.tests.includes("#[test]")) report("/boss", "tests contain no #[test]");
-  if (boss.hints.length < 1 || boss.hints.length > 3) report("/boss", "needs 1-3 hints");
+  const rounds = island.boss.rounds;
+  if (rounds.length < 3 || rounds.length > 6) report("/boss", "needs 3-6 rounds");
+  rounds.forEach((round, index) => {
+    const where = `/boss/round ${index + 1}`;
+    for (const field of ["title", "task", "starter", "solution", "hint"] as const) {
+      if (!round[field].trim()) report(where, `${field} is empty`);
+    }
+    if (!round.tests.includes("#[test]")) report(where, "tests contain no #[test]");
+    if (!round.starter.includes("fn main")) report(where, "starter has no fn main");
+    if (!round.solution.includes("fn main")) report(where, "solution has no fn main");
+  });
   return errors;
 }
 

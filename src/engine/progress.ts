@@ -66,11 +66,6 @@ export function starsForMistakes(mistakes: number): Stars {
   return mistakes <= 2 ? 2 : 1;
 }
 
-export function starsForHints(hints: number): Stars {
-  if (hints === 0) return 3;
-  return hints === 1 ? 2 : 1;
-}
-
 function bestStars(previous: Stars | undefined, next: Stars): Stars {
   return previous !== undefined && previous > next ? previous : next;
 }
@@ -87,13 +82,12 @@ export function recordStageComplete(save: SaveData, islandId: string, stageId: s
   return { ...save, stages: { ...save.stages, [key]: { stars } } };
 }
 
-export function recordBossDefeated(save: SaveData, islandId: string, hintsUsed: number): SaveData {
+export function recordBossDefeated(save: SaveData, islandId: string, stars: Stars): SaveData {
   const previous = save.bosses[islandId]?.stars;
-  const stars = bestStars(previous, starsForHints(hintsUsed));
   return {
     ...save,
     xp: previous === undefined ? save.xp + XP_PER_BOSS : save.xp,
-    bosses: { ...save.bosses, [islandId]: { stars } },
+    bosses: { ...save.bosses, [islandId]: { stars: bestStars(previous, stars) } },
   };
 }
 

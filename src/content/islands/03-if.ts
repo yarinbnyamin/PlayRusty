@@ -373,99 +373,166 @@ export const ifIsland: Island = {
   boss: {
     name: "The Fork Kraken",
     story:
-      "The water of Branching Bay boils, and the Fork Kraken rises! Each of its tentacles is a function that has to choose the right path. Fix them all to send it back to the deep.",
-    starter: rs`
-      // Fix or finish each function so the program compiles and all the tests pass.
-
-      // Tentacle 1: return the bigger of a and b.
-      fn bigger(a: i32, b: i32) -> i32 {
-          // Write an if/else expression here.
-      }
-
-      // Tentacle 2: return 1 for positive numbers, -1 for negative numbers,
-      // and 0 for zero.
-      fn sign(n: i32) -> i32 {
-          if n > 0 {
-              1
-          } else if n < 0 {
-              -1
+      "The water of Branching Bay boils, and the Fork Kraken rises! Each of its four tentacles is a function that has to choose the right path. Fix them one at a time to send it back to the deep.",
+    rounds: [
+      {
+        title: "The tentacle of choice",
+        task: "Return the bigger of `a` and `b`.",
+        starter: rs`
+          fn bigger(a: i32, b: i32) -> i32 {
+              // Write an if/else expression here.
           }
-      }
 
-      // Tentacle 3: a number is lucky if it's divisible by 7
-      // or if its last digit is 7 (that is, n % 10 == 7).
-      fn is_lucky(n: u32) -> bool {
-          if n % 7 == 0 || n % 10 == 7 {
-              true
-          } else {
-              "false"
+          fn main() {
+              println!("{}", bigger(10, 8));
           }
-      }
-
-      fn main() {
-          println!("The Kraken rises!");
-      }
-    `,
-    tests: rs`
-      #[test]
-      fn bigger_picks_the_first() {
-          assert_eq!(bigger(10, 8), 10);
-      }
-
-      #[test]
-      fn bigger_picks_the_second() {
-          assert_eq!(bigger(32, 42), 42);
-      }
-
-      #[test]
-      fn sign_handles_all_cases() {
-          assert_eq!(sign(5), 1);
-          assert_eq!(sign(-3), -1);
-          assert_eq!(sign(0), 0);
-      }
-
-      #[test]
-      fn lucky_numbers() {
-          assert!(is_lucky(14));
-          assert!(is_lucky(27));
-          assert!(!is_lucky(10));
-      }
-    `,
-    solution: rs`
-      fn bigger(a: i32, b: i32) -> i32 {
-          if a > b {
-              a
-          } else {
-              b
+        `,
+        tests: rs`
+          #[test]
+          fn bigger_picks_the_first() {
+              assert_eq!(bigger(10, 8), 10);
           }
-      }
 
-      fn sign(n: i32) -> i32 {
-          if n > 0 {
-              1
-          } else if n < 0 {
-              -1
-          } else {
-              0
+          #[test]
+          fn bigger_picks_the_second() {
+              assert_eq!(bigger(32, 42), 42);
           }
-      }
-
-      fn is_lucky(n: u32) -> bool {
-          if n % 7 == 0 || n % 10 == 7 {
-              true
-          } else {
-              false
+        `,
+        solution: rs`
+          fn bigger(a: i32, b: i32) -> i32 {
+              if a > b {
+                  a
+              } else {
+                  b
+              }
           }
-      }
 
-      fn main() {
-          println!("The Kraken rises!");
-      }
-    `,
-    hints: [
-      "Tentacle 1: the body is empty, so it returns nothing. Make `if a > b { a } else { b }` the last expression.",
-      "Tentacle 2: when `if` produces a value, every path needs one. What happens when `n` is 0?",
-      "Tentacle 3: both branches must have the same type. `\"false\"` in quotes is text, but `false` is a `bool`.",
+          fn main() {
+              println!("{}", bigger(10, 8));
+          }
+        `,
+        hint: "The body is empty, so it gives back nothing. Make an `if a > b { ... } else { ... }` expression the last thing in the body.",
+      },
+      {
+        title: "The tentacle of signs",
+        task: "Return 1 for positive numbers, -1 for negative numbers and 0 for zero.",
+        starter: rs`
+          fn sign(n: i32) -> i32 {
+              if n > 0 {
+                  1
+              } else if n < 0 {
+                  -1
+              }
+          }
+
+          fn main() {
+              println!("{}", sign(-3));
+          }
+        `,
+        tests: rs`
+          #[test]
+          fn sign_handles_all_cases() {
+              assert_eq!(sign(5), 1);
+              assert_eq!(sign(-3), -1);
+              assert_eq!(sign(0), 0);
+          }
+        `,
+        solution: rs`
+          fn sign(n: i32) -> i32 {
+              if n > 0 {
+                  1
+              } else if n < 0 {
+                  -1
+              } else {
+                  0
+              }
+          }
+
+          fn main() {
+              println!("{}", sign(-3));
+          }
+        `,
+        hint: "When `if` produces a value, every path needs one. What happens when `n` is 0?",
+      },
+      {
+        title: "The tentacle of luck",
+        task: "A number is lucky if it's divisible by 7 or its last digit is 7 (that is, `n % 10 == 7`).",
+        starter: rs`
+          fn is_lucky(n: u32) -> bool {
+              if n % 7 == 0 || n % 10 == 7 {
+                  true
+              } else {
+                  "false"
+              }
+          }
+
+          fn main() {
+              println!("{}", is_lucky(27));
+          }
+        `,
+        tests: rs`
+          #[test]
+          fn lucky_numbers() {
+              assert!(is_lucky(14));
+              assert!(is_lucky(27));
+              assert!(!is_lucky(10));
+          }
+        `,
+        solution: rs`
+          fn is_lucky(n: u32) -> bool {
+              if n % 7 == 0 || n % 10 == 7 {
+                  true
+              } else {
+                  false
+              }
+          }
+
+          fn main() {
+              println!("{}", is_lucky(27));
+          }
+        `,
+        hint: "Both branches must have the same type. `\"false\"` in quotes is text, but `false` is a `bool`.",
+      },
+      {
+        title: "The tentacle of speed",
+        task: "A ship sails at speed 1 in a storm and speed 3 in calm water. Make `ship_speed` give back the right number.",
+        starter: rs`
+          fn ship_speed(storm: bool) -> u32 {
+              let speed = if storm {
+                  1;
+              } else {
+                  3;
+              };
+              speed
+          }
+
+          fn main() {
+              println!("Speed in a storm: {}", ship_speed(true));
+          }
+        `,
+        tests: rs`
+          #[test]
+          fn ship_speed_matches_the_weather() {
+              assert_eq!(ship_speed(true), 1);
+              assert_eq!(ship_speed(false), 3);
+          }
+        `,
+        solution: rs`
+          fn ship_speed(storm: bool) -> u32 {
+              let speed = if storm {
+                  1
+              } else {
+                  3
+              };
+              speed
+          }
+
+          fn main() {
+              println!("Speed in a storm: {}", ship_speed(true));
+          }
+        `,
+        hint: "Look inside each branch: a semicolon after a value turns it into a statement, so the branch gives back nothing. The `let` line itself still ends with `;`.",
+      },
     ],
   },
 };

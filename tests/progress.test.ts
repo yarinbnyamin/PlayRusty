@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   XP_PER_BOSS, XP_PER_PUZZLE, currentIslandId, isIslandUnlocked, isJumpChallenge, isStageUnlocked,
-  recordBossDefeated, recordPuzzleSolved, recordStageComplete, starsForHints, starsForMistakes,
+  recordBossDefeated, recordPuzzleSolved, recordStageComplete, starsForMistakes,
   totalStars, visiblePages, visibleStages,
 } from "../src/engine/progress";
 import type { Stage } from "../src/engine/types";
@@ -36,7 +36,7 @@ describe("unlocking", () => {
     const save = emptySave();
     expect(isIslandUnlocked(islands, "a", save)).toBe(true);
     expect(isIslandUnlocked(islands, "b", save)).toBe(false);
-    expect(isIslandUnlocked(islands, "b", recordBossDefeated(save, "a", 0))).toBe(true);
+    expect(isIslandUnlocked(islands, "b", recordBossDefeated(save, "a", 3))).toBe(true);
     expect(isIslandUnlocked(islands, "nope", save)).toBe(false);
   });
 
@@ -64,7 +64,7 @@ describe("unlocking", () => {
 
   it("unlocks every island up to and after a boss beaten by jumping ahead", () => {
     const four = [islandA, islandB, makeIsland("c"), makeIsland("d")];
-    const save = recordBossDefeated(emptySave(), "c", 0);
+    const save = recordBossDefeated(emptySave(), "c", 3);
     expect(isIslandUnlocked(four, "a", save)).toBe(true);
     expect(isIslandUnlocked(four, "b", save)).toBe(true);
     expect(isIslandUnlocked(four, "c", save)).toBe(true);
@@ -75,12 +75,12 @@ describe("unlocking", () => {
     const save = emptySave();
     expect(isJumpChallenge(islands, "a", save)).toBe(false);
     expect(isJumpChallenge(islands, "b", save)).toBe(true);
-    expect(isJumpChallenge(islands, "b", recordBossDefeated(save, "a", 0))).toBe(false);
+    expect(isJumpChallenge(islands, "b", recordBossDefeated(save, "a", 3))).toBe(false);
     expect(isJumpChallenge(islands, "nope", save)).toBe(false);
   });
 
   it("opens every stage once the island's boss is beaten", () => {
-    const save = recordBossDefeated(emptySave("beginner"), "a", 0);
+    const save = recordBossDefeated(emptySave("beginner"), "a", 3);
     expect(isStageUnlocked(islands, "a", "s2", save)).toBe(true);
     expect(isStageUnlocked(islands, "a", "nope", save)).toBe(false);
   });
@@ -88,11 +88,11 @@ describe("unlocking", () => {
   it("finds the island Ferris should stand on", () => {
     const save = emptySave();
     expect(currentIslandId(islands, save)).toBe("a");
-    const afterA = recordBossDefeated(save, "a", 0);
+    const afterA = recordBossDefeated(save, "a", 3);
     expect(currentIslandId(islands, afterA)).toBe("b");
-    expect(currentIslandId(islands, recordBossDefeated(afterA, "b", 0))).toBe("b");
+    expect(currentIslandId(islands, recordBossDefeated(afterA, "b", 3))).toBe("b");
     const three = [islandA, islandB, makeIsland("c")];
-    expect(currentIslandId(three, recordBossDefeated(save, "b", 0))).toBe("c");
+    expect(currentIslandId(three, recordBossDefeated(save, "b", 3))).toBe("c");
     expect(currentIslandId([], save)).toBeNull();
   });
 });
@@ -100,10 +100,6 @@ describe("unlocking", () => {
 describe("scoring", () => {
   it("turns mistakes into stars", () => {
     expect([0, 1, 2, 3, 9].map(starsForMistakes)).toEqual([3, 2, 2, 1, 1]);
-  });
-
-  it("turns hints into stars", () => {
-    expect([0, 1, 2, 3].map(starsForHints)).toEqual([3, 2, 1, 1]);
   });
 
   it("awards puzzle XP only once", () => {
@@ -124,17 +120,19 @@ describe("scoring", () => {
   });
 
   it("awards boss XP once and keeps the best boss stars", () => {
-    let save = recordBossDefeated(emptySave(), "a", 2);
+    let save = recordBossDefeated(emptySave(), "a", 1);
     expect(save.xp).toBe(XP_PER_BOSS);
     expect(save.bosses.a.stars).toBe(1);
-    save = recordBossDefeated(save, "a", 0);
+    save = recordBossDefeated(save, "a", 3);
     expect(save.xp).toBe(XP_PER_BOSS);
+    expect(save.bosses.a.stars).toBe(3);
+    save = recordBossDefeated(save, "a", 2);
     expect(save.bosses.a.stars).toBe(3);
   });
 
   it("sums stage and boss stars", () => {
     let save = recordStageComplete(emptySave(), "a", "s1", 0);
-    save = recordBossDefeated(save, "a", 1);
+    save = recordBossDefeated(save, "a", 2);
     expect(totalStars(save)).toBe(5);
   });
 
@@ -142,7 +140,7 @@ describe("scoring", () => {
     const save = emptySave();
     recordPuzzleSolved(save, "a", "s1", "p1");
     recordStageComplete(save, "a", "s1", 0);
-    recordBossDefeated(save, "a", 0);
+    recordBossDefeated(save, "a", 3);
     expect(save).toEqual(emptySave());
   });
 });

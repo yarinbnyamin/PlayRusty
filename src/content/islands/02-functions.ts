@@ -374,78 +374,122 @@ export const functionsIsland: Island = {
   boss: {
     name: "The Signature Sphinx",
     story:
-      "On a cliff above the fjord sits the Signature Sphinx. \"Answer my four riddles,\" it purrs, \"and you may sail on.\" Each riddle is a function, and each one is wrong.",
-    starter: rs`
-      // Fix each riddle so the program compiles and all four tests pass.
+      "On a cliff above the fjord sits the Signature Sphinx. \"Answer my four riddles, one at a time,\" it purrs, \"and you may sail on.\" Each riddle is a function, and each one is wrong.",
+    rounds: [
+      {
+        title: "The riddle of legs",
+        task: "Return twice the number of legs.",
+        starter: rs`
+          fn riddle_one(legs: u32) -> u32 {
+              legs * 2;
+          }
 
-      // Riddle 1: return twice the number of legs.
-      fn riddle_one(legs: u32) -> u32 {
-          legs * 2;
-      }
+          fn main() {
+              println!("{}", riddle_one(4));
+          }
+        `,
+        tests: rs`
+          #[test]
+          fn riddle_one_doubles() {
+              assert_eq!(riddle_one(4), 8);
+          }
+        `,
+        solution: rs`
+          fn riddle_one(legs: u32) -> u32 {
+              legs * 2
+          }
 
-      // Riddle 2: return the sum of a and b.
-      fn riddle_two(a: i32, b) -> i32 {
-          a + b
-      }
+          fn main() {
+              println!("{}", riddle_one(4));
+          }
+        `,
+        hint: "Look at the last line of the body. What does a semicolon do to a value?",
+      },
+      {
+        title: "The riddle of sums",
+        task: "Return the sum of `a` and `b`.",
+        starter: rs`
+          fn riddle_two(a: i32, b) -> i32 {
+              a + b
+          }
 
-      // Riddle 3: return the number 42.
-      fn riddle_three() {
-          42
-      }
+          fn main() {
+              println!("{}", riddle_two(2, 3));
+          }
+        `,
+        tests: rs`
+          #[test]
+          fn riddle_two_adds() {
+              assert_eq!(riddle_two(2, 3), 5);
+          }
+        `,
+        solution: rs`
+          fn riddle_two(a: i32, b: i32) -> i32 {
+              a + b
+          }
 
-      // Riddle 4: write a function named riddle_four that takes no
-      // parameters and returns the u32 number 7. It doesn't exist yet!
+          fn main() {
+              println!("{}", riddle_two(2, 3));
+          }
+        `,
+        hint: "Every parameter needs a type, just like `a` has one.",
+      },
+      {
+        title: "The riddle of the answer",
+        task: "Return the number 42.",
+        starter: rs`
+          fn riddle_three() {
+              42
+          }
 
-      fn main() {
-          println!("The Sphinx is waiting...");
-      }
-    `,
-    tests: rs`
-      #[test]
-      fn riddle_one_doubles() {
-          assert_eq!(riddle_one(4), 8);
-      }
+          fn main() {
+              println!("{}", riddle_three());
+          }
+        `,
+        tests: rs`
+          #[test]
+          fn riddle_three_is_42() {
+              assert_eq!(riddle_three(), 42);
+          }
+        `,
+        solution: rs`
+          fn riddle_three() -> i32 {
+              42
+          }
 
-      #[test]
-      fn riddle_two_adds() {
-          assert_eq!(riddle_two(2, 3), 5);
-      }
+          fn main() {
+              println!("{}", riddle_three());
+          }
+        `,
+        hint: "A function that gives back a value needs `-> type` after its parentheses.",
+      },
+      {
+        title: "The missing riddle",
+        task: "Write a function named `riddle_four` that takes no parameters and returns the `u32` number 7. It doesn't exist yet!",
+        starter: rs`
+          // Write riddle_four here.
 
-      #[test]
-      fn riddle_three_is_42() {
-          assert_eq!(riddle_three(), 42);
-      }
+          fn main() {
+              println!("The Sphinx is waiting...");
+          }
+        `,
+        tests: rs`
+          #[test]
+          fn riddle_four_is_7() {
+              assert_eq!(riddle_four(), 7);
+          }
+        `,
+        solution: rs`
+          fn riddle_four() -> u32 {
+              7
+          }
 
-      #[test]
-      fn riddle_four_is_7() {
-          assert_eq!(riddle_four(), 7);
-      }
-    `,
-    solution: rs`
-      fn riddle_one(legs: u32) -> u32 {
-          legs * 2
-      }
-
-      fn riddle_two(a: i32, b: i32) -> i32 {
-          a + b
-      }
-
-      fn riddle_three() -> i32 {
-          42
-      }
-
-      fn riddle_four() -> u32 {
-          7
-      }
-
-      fn main() {
-          println!("The Sphinx is waiting...");
-      }
-    `,
-    hints: [
-      "Riddle 1: look at the last line of the body. What does a semicolon do to a value?",
-      "Riddle 2: every parameter needs a type. Riddle 3: a function that returns a value needs `-> type`.",
-      "Riddle 4: write a new function from scratch: `fn riddle_four() -> u32 { ... }` with `7` as its last expression.",
+          fn main() {
+              println!("The Sphinx is waiting...");
+          }
+        `,
+        hint: "Write it from scratch: `fn riddle_four() -> u32 { ... }` with `7` as its last expression.",
+      },
     ],
   },
 };

@@ -538,96 +538,151 @@ export const variablesIsland: Island = {
   boss: {
     name: "The Immutable Golem",
     story:
-      "A hulking golem of grey stone blocks the bridge out of the marsh. \"NOTHING HERE MAY CHANGE,\" it rumbles. Fix its four broken lines to prove you understand variables, mutability and constants, and it will crumble.",
-    starter: rs`
-      // Fix every line marked FIX ME so the program compiles and all the tests pass.
-      //
-      // The fn ... { lines are functions. You'll learn them on the next island.
-      // For now, leave the fn lines alone, and also leave the last line of each
-      // function as it is: a last line with no semicolon hands its value back.
+      "A hulking golem of grey stone blocks the bridge out of the marsh. \"NOTHING HERE MAY CHANGE,\" it rumbles. Break its four runes one at a time to prove you understand variables, mutability and constants, and it will crumble.",
+    rounds: [
+      {
+        title: "The height rune",
+        task: "The golem's height is a constant, but this one won't compile. Fix the line marked FIX ME.",
+        starter: rs`
+          // Leave the fn lines alone: you'll learn about functions on the next island.
+          // A last line with no semicolon hands its value back.
 
-      const BRIDGE_TOLL: u32 = 3;
-      const GOLEM_HEIGHT = 12; // FIX ME: the golem's height is a u32
+          const GOLEM_HEIGHT = 12; // FIX ME: the golem's height is a u32
 
-      fn coins_after_bridge() -> u32 {
-          let coins = 10;
-          coins = coins - BRIDGE_TOLL; // FIX ME
-          coins
-      }
+          fn golem_height() -> u32 {
+              GOLEM_HEIGHT
+          }
 
-      fn rune_count() -> usize {
-          let mut runes = "rust!";
-          runes = runes.len(); // FIX ME
-          runes
-      }
+          fn main() {
+              println!("The golem is {} blocks tall.", golem_height());
+          }
+        `,
+        tests: rs`
+          #[test]
+          fn golem_height_is_12() {
+              assert_eq!(golem_height(), 12);
+          }
+        `,
+        solution: rs`
+          const GOLEM_HEIGHT: u32 = 12;
 
-      fn bridge_length() -> i32 {
-          let length: i32; // FIX ME: the bridge is 20 steps long
-          length
-      }
+          fn golem_height() -> u32 {
+              GOLEM_HEIGHT
+          }
 
-      fn golem_height() -> u32 {
-          GOLEM_HEIGHT
-      }
+          fn main() {
+              println!("The golem is {} blocks tall.", golem_height());
+          }
+        `,
+        hint: "A constant always needs its type written after its name: `const NAME: type = value;`.",
+      },
+      {
+        title: "The toll rune",
+        task: "Pay the bridge toll: the coins must go down by the toll. Fix the line marked FIX ME.",
+        starter: rs`
+          // Leave the fn lines alone: you'll learn about functions on the next island.
 
-      fn main() {
-          println!("Coins left: {}", coins_after_bridge());
-      }
-    `,
-    tests: rs`
-      #[test]
-      fn golem_height_is_12() {
-          assert_eq!(golem_height(), 12);
-      }
+          const BRIDGE_TOLL: u32 = 3;
 
-      #[test]
-      fn pay_the_toll() {
-          assert_eq!(coins_after_bridge(), 7);
-      }
+          fn coins_after_bridge() -> u32 {
+              let coins = 10;
+              coins = coins - BRIDGE_TOLL; // FIX ME
+              coins
+          }
 
-      #[test]
-      fn count_the_runes() {
-          assert_eq!(rune_count(), 5);
-      }
+          fn main() {
+              println!("Coins left: {}", coins_after_bridge());
+          }
+        `,
+        tests: rs`
+          #[test]
+          fn pay_the_toll() {
+              assert_eq!(coins_after_bridge(), 7);
+          }
+        `,
+        solution: rs`
+          const BRIDGE_TOLL: u32 = 3;
 
-      #[test]
-      fn measure_the_bridge() {
-          assert_eq!(bridge_length(), 20);
-      }
-    `,
-    solution: rs`
-      const BRIDGE_TOLL: u32 = 3;
-      const GOLEM_HEIGHT: u32 = 12;
+          fn coins_after_bridge() -> u32 {
+              let mut coins = 10;
+              coins = coins - BRIDGE_TOLL;
+              coins
+          }
 
-      fn coins_after_bridge() -> u32 {
-          let mut coins = 10;
-          coins = coins - BRIDGE_TOLL;
-          coins
-      }
+          fn main() {
+              println!("Coins left: {}", coins_after_bridge());
+          }
+        `,
+        hint: "`coins` changes after it's created. Which keyword lets a variable change?",
+      },
+      {
+        title: "The counting rune",
+        task: "Count the letters on the rune. Fix the line marked FIX ME without changing the text.",
+        starter: rs`
+          // Leave the fn lines alone: you'll learn about functions on the next island.
 
-      fn rune_count() -> usize {
-          let runes = "rust!";
-          let runes = runes.len();
-          runes
-      }
+          fn rune_count() -> usize {
+              let mut runes = "rust!";
+              runes = runes.len(); // FIX ME
+              runes
+          }
 
-      fn bridge_length() -> i32 {
-          let length: i32 = 20;
-          length
-      }
+          fn main() {
+              println!("The rune has {} letters.", rune_count());
+          }
+        `,
+        tests: rs`
+          #[test]
+          fn count_the_runes() {
+              assert_eq!(rune_count(), 5);
+          }
+        `,
+        solution: rs`
+          fn rune_count() -> usize {
+              let runes = "rust!";
+              let runes = runes.len();
+              runes
+          }
 
-      fn golem_height() -> u32 {
-          GOLEM_HEIGHT
-      }
+          fn main() {
+              println!("The rune has {} letters.", rune_count());
+          }
+        `,
+        hint: "`runes` starts as text and has to become a number. `mut` can't change a variable's type, but a second `let` (shadowing) can.",
+      },
+      {
+        title: "The bridge rune",
+        task: "Measure the bridge: it's 20 steps long. Fix the line marked FIX ME.",
+        starter: rs`
+          // Leave the fn lines alone: you'll learn about functions on the next island.
 
-      fn main() {
-          println!("Coins left: {}", coins_after_bridge());
-      }
-    `,
-    hints: [
-      "Start at the top: a constant always needs a type. Look at how `BRIDGE_TOLL` is written.",
-      "`coins` changes after it's created, so it must be mutable. `runes` changes from text to a number, which only shadowing (a second `let`) can do.",
-      "`let length: i32;` declares a variable but never gives it a value. Give it the value 20 on that same line.",
+          fn bridge_length() -> i32 {
+              let length: i32; // FIX ME: the bridge is 20 steps long
+              length
+          }
+
+          fn main() {
+              println!("The bridge is {} steps long.", bridge_length());
+          }
+        `,
+        tests: rs`
+          #[test]
+          fn measure_the_bridge() {
+              assert_eq!(bridge_length(), 20);
+          }
+        `,
+        solution: rs`
+          fn bridge_length() -> i32 {
+              let length: i32 = 20;
+              length
+          }
+
+          fn main() {
+              println!("The bridge is {} steps long.", bridge_length());
+          }
+        `,
+        hint: "`let length: i32;` declares a variable but never gives it a value. Give it the value 20 on that same line.",
+      },
     ],
   },
 };

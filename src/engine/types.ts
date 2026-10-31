@@ -62,15 +62,24 @@ export interface Stage {
   puzzles: Puzzle[];
 }
 
-export interface Boss {
-  name: string;
-  story: string;
+export interface BossRound {
+  title: string;
+  /** Markdown subset, shown above the round's editor. */
+  task: string;
+  /** Complete program with fn main. Must fail its tests. */
   starter: string;
   /** Body of the hidden test module: #[test] functions only. */
   tests: string;
   /** Reference solution, used only by the verify script. */
   solution: string;
-  hints: string[];
+  /** Markdown subset. */
+  hint: string;
+}
+
+export interface Boss {
+  name: string;
+  story: string;
+  rounds: BossRound[];
 }
 
 export interface Island {

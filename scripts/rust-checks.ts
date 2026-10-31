@@ -18,9 +18,11 @@ export function collectChecks(islands: Island[]): RustCheck[] {
         }
       });
     }
-    const { starter, solution, tests } = island.boss;
-    checks.push({ name: `${island.id}-boss-starter`, kind: "test", code: buildBossProgram(starter, tests), expect: "fail" });
-    checks.push({ name: `${island.id}-boss-solution`, kind: "test", code: buildBossProgram(solution, tests), expect: "pass" });
+    island.boss.rounds.forEach((round, index) => {
+      const name = `${island.id}-boss-r${index + 1}`;
+      checks.push({ name: `${name}-starter`, kind: "test", code: buildBossProgram(round.starter, round.tests), expect: "fail" });
+      checks.push({ name: `${name}-solution`, kind: "test", code: buildBossProgram(round.solution, round.tests), expect: "pass" });
+    });
   }
   return checks;
 }

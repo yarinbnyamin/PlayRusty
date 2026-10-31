@@ -188,3 +188,6 @@ pre.code code { font-family: inherit; }
 }
 .volume { display: flex; gap: 12px; align-items: center; padding: 6px 0; }
 .volume input { flex: 1; max-width: 240px; accent-color: var(--rust); }
+.hearts { font-size: 1.4rem; letter-spacing: 4px; margin: 4px 0 16px; }
+.round { border-top: 2px solid var(--line); margin-top: 8px; padding-top: 4px; }
+.defeat { border: 2px solid var(--bad); border-radius: 12px; padding: 4px 16px; margin: 16px 0; }

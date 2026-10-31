@@ -1,30 +1,39 @@
+import { attack, canHint, fightStars, nextRound, startFight, takeHint, type Attack, type FightState } from "../../engine/fight";
 import { isIslandUnlocked, isJumpChallenge, recordBossDefeated } from "../../engine/progress";
-import type { Island } from "../../engine/types";
+import type { BossRound, Island } from "../../engine/types";
 import { buildBossProgram, countTests } from "../../playground/bossProgram";
 import { runCode } from "../../playground/client";
 import { parseTestOutput } from "../../playground/testOutput";
 import { routeToHash } from "../../router";
 import { noop, type AppContext, type Cleanup } from "../app";
-import { createCodeEditor } from "../components/codeEditor";
+import { createCodeEditor, type CodeEditor } from "../components/codeEditor";
 import { createConsole } from "../components/console";
+import { createHearts } from "../components/hearts";
 import { createHpBar } from "../components/hpBar";
 import { renderHud } from "../components/hud";
 import { h } from "../dom";
 import { prose } from "../markdown";
 import { noteBossWin } from "./celebrate";
 
+/** Classifies one Run of a round: every test passed, a test failed, or the code didn't compile. */
+export function judgeRun(round: BossRound, stdout: string, stderr: string): Attack {
+  const report = parseTestOutput(stdout, stderr);
+  if (!report.compiled) return "fizzle";
+  const allPassed = report.failed.length === 0 && report.passed.length === countTests(round.tests);
+  return allPassed ? "hit" : "miss";
+}
+
 export function renderBoss(root: HTMLElement, ctx: AppContext, islandId: string): Cleanup {
-  const save = ctx.getSave();
   const foundIsland = ctx.islands.find((i) => i.id === islandId);
   if (!foundIsland) {
     ctx.go({ name: "map" });
     return noop;
   }
   const island: Island = foundIsland;
-  const jump = isJumpChallenge(ctx.islands, islandId, save);
   const boss = island.boss;
-  const total = countTests(boss.tests);
-  let hintsUsed = 0;
+  const jump = isJumpChallenge(ctx.islands, islandId, ctx.getSave());
+  let fight: FightState = startFight(boss.rounds.length);
+  let editor: CodeEditor | null = null;
   let alive = true;
 
   const main = h("main", { class: "boss" });
@@ -34,88 +43,141 @@ export function renderBoss(root: HTMLElement, ctx: AppContext, islandId: string)
     h("h1", {}, `⚔ ${boss.name}`),
     prose(boss.story),
     ...(jump ? [h("p", { class: "jump-notice" }, `Jump challenge: beat this boss to unlock every island up to ${island.name}.`)] : []),
-    h("p", { class: "muted" }, "Fix the code below. When you press Run, hidden tests attack the boss: every passing test is a hit."),
+    h("p", { class: "muted" },
+      "Solve one round at a time. Each solved round hits the boss. A failed test costs you a heart; code that doesn't compile costs half a heart."),
   );
-  const hp = createHpBar(main, boss.name, total);
+  const hp = createHpBar(main, boss.name, fight.bossHp);
+  const hearts = createHearts(main, fight.halves);
+  const panel = h("section", { class: "round" });
+  main.append(panel);
 
-  const editorHost = h("div", { class: "editor" });
-  const runButton = h("button", { class: "btn primary" }, "▶ Run");
-  const hintButton = h("button", { class: "btn", disabled: true, title: "Run your code once to unlock hints" },
-    `Hint (0/${boss.hints.length})`);
-  const resetButton = h("button", { class: "btn" }, "Reset code");
-  const hintList = h("ol", { class: "hints" });
-  const consoleHost = h("div");
-  main.append(editorHost, h("div", { class: "row" }, runButton, hintButton, resetButton), hintList, consoleHost);
-
-  const editor = createCodeEditor(editorHost, save.bossCode[island.id] ?? boss.starter);
-  const output = createConsole(consoleHost);
-  const persistCode = () =>
-    ctx.update((s) => ({ ...s, bossCode: { ...s.bossCode, [island.id]: editor.getCode() } }));
-
-  hintButton.addEventListener("click", () => {
-    if (hintsUsed >= boss.hints.length) return;
-    hintList.append(h("li", {}, prose(boss.hints[hintsUsed])));
-    hintsUsed += 1;
-    hintButton.textContent = `Hint (${hintsUsed}/${boss.hints.length})`;
-    hintButton.disabled = hintsUsed >= boss.hints.length;
-  });
-
-  resetButton.addEventListener("click", () => {
-    if (window.confirm("Replace your code with the original starter code?")) {
-      editor.setCode(boss.starter);
-      persistCode();
-    }
-  });
-
-  async function run(): Promise<void> {
-    persistCode();
-    runButton.disabled = true;
-    output.showRunning();
-    const result = await runCode(buildBossProgram(editor.getCode(), boss.tests), { tests: true });
-    if (!alive) return;
-    runButton.disabled = false;
-    if (!result.ok) {
-      output.showError(result.message, () => void run());
-      return;
-    }
-    hintButton.disabled = hintsUsed >= boss.hints.length;
-    hintButton.removeAttribute("title");
-
-    const report = parseTestOutput(result.stdout, result.stderr);
-    if (!report.compiled) {
-      hp.set(total);
-      output.showOutput("", result.stderr, {
-        text: "💥 Your attack fizzled: the code doesn't compile yet. Read the compiler's message below.",
-        kind: "error",
-      });
-      return;
-    }
-    hp.set(total - report.passed.length);
-    if (report.failed.length === 0 && report.passed.length === total) {
-      const before = ctx.getSave();
-      const wasOpen = new Set(ctx.islands.filter((i) => isIslandUnlocked(ctx.islands, i.id, before)).map((i) => i.id));
-      ctx.update((s) => recordBossDefeated(s, island.id, hintsUsed));
-      const after = ctx.getSave();
-      const newlyOpened = ctx.islands
-        .filter((i) => !wasOpen.has(i.id) && isIslandUnlocked(ctx.islands, i.id, after))
-        .map((i) => i.id);
-      noteBossWin(after.xp - before.xp, jump, newlyOpened);
-      ctx.go({ name: "celebrate", islandId: island.id });
-      return;
-    }
-    output.showOutput(result.stdout, "", {
-      text: `${report.passed.length} of ${total} hits landed. ${boss.name} is still standing!`,
-      kind: "info",
-    });
+  function closeEditor(): void {
+    editor?.destroy();
+    editor = null;
   }
-  runButton.addEventListener("click", () => void run());
 
-  window.addEventListener("pagehide", persistCode);
+  function win(): void {
+    const before = ctx.getSave();
+    const wasOpen = new Set(ctx.islands.filter((i) => isIslandUnlocked(ctx.islands, i.id, before)).map((i) => i.id));
+    ctx.update((s) => recordBossDefeated(s, island.id, fightStars(fight)));
+    const after = ctx.getSave();
+    const newlyOpened = ctx.islands
+      .filter((i) => !wasOpen.has(i.id) && isIslandUnlocked(ctx.islands, i.id, after))
+      .map((i) => i.id);
+    noteBossWin(after.xp - before.xp, jump, newlyOpened);
+    ctx.go({ name: "celebrate", islandId: island.id });
+  }
+
+  function restart(): void {
+    fight = startFight(boss.rounds.length);
+    hp.set(fight.bossHp);
+    hearts.set(fight.halves);
+    showRound();
+  }
+
+  function showRound(): void {
+    closeEditor();
+    panel.replaceChildren();
+    const round = boss.rounds[fight.round];
+    const heading = h("h2", { tabindex: -1 }, `Round ${fight.round + 1} of ${fight.rounds}: ${round.title}`);
+    const editorHost = h("div", { class: "editor" });
+    const runButton = h("button", { class: "btn primary" }, "▶ Run");
+    const hintButton = h("button", { class: "btn" });
+    const resetButton = h("button", { class: "btn" }, "Reset code");
+    const hintList = h("ol", { class: "hints" });
+    const consoleHost = h("div");
+    const nextRow = h("div", { class: "row" });
+    panel.append(heading, prose(round.task), editorHost,
+      h("div", { class: "row" }, runButton, hintButton, resetButton), hintList, consoleHost, nextRow);
+    const roundEditor = createCodeEditor(editorHost, round.starter);
+    editor = roundEditor;
+    const output = createConsole(consoleHost);
+    if (fight.round > 0) heading.focus();
+
+    const syncHint = () => {
+      hintButton.textContent = `💡 Hint (${fight.hintsLeft} left)`;
+      hintButton.disabled = !canHint(fight);
+      const why = fight.roundHinted ? "You've used this round's hint" : fight.hintsLeft === 0 ? "No hints left" : null;
+      if (why) hintButton.title = why;
+      else hintButton.removeAttribute("title");
+    };
+    syncHint();
+
+    hintButton.addEventListener("click", () => {
+      if (!canHint(fight)) return;
+      fight = takeHint(fight);
+      hintList.append(h("li", {}, prose(round.hint)));
+      syncHint();
+    });
+
+    resetButton.addEventListener("click", () => {
+      if (window.confirm("Replace your code with this round's starter code?")) roundEditor.setCode(round.starter);
+    });
+
+    async function run(): Promise<void> {
+      runButton.disabled = true;
+      output.showRunning();
+      const result = await runCode(buildBossProgram(roundEditor.getCode(), round.tests), { tests: true });
+      if (!alive || editor !== roundEditor) return;
+      if (!result.ok) {
+        runButton.disabled = false;
+        output.showError(result.message, () => void run());
+        return;
+      }
+      const outcome = judgeRun(round, result.stdout, result.stderr);
+      fight = attack(fight, outcome);
+      hp.set(fight.bossHp);
+      hearts.set(fight.halves);
+      if (fight.status === "won") {
+        win();
+        return;
+      }
+      syncHint();
+      if (outcome === "hit") {
+        output.showOutput(result.stdout, "", { text: `💥 Hit! ${boss.name} loses 1 HP.`, kind: "success" });
+        const next = h("button", { class: "btn primary" }, "Next round →");
+        next.addEventListener("click", () => {
+          fight = nextRound(fight);
+          showRound();
+        });
+        nextRow.append(next);
+        next.focus();
+        return;
+      }
+      if (outcome === "miss") {
+        output.showOutput(result.stdout, "", { text: `🛡 ${boss.name} blocked your attack and hit back. You lose a heart.`, kind: "error" });
+      } else {
+        output.showOutput("", result.stderr, {
+          text: "💨 Your attack fizzled: the code doesn't compile, and you lose half a heart. Read the compiler's message below.",
+          kind: "error",
+        });
+      }
+      if (fight.status === "lost") {
+        showDefeat(resetButton);
+        return;
+      }
+      runButton.disabled = false;
+    }
+    runButton.addEventListener("click", () => void run());
+  }
+
+  function showDefeat(resetButton: HTMLButtonElement): void {
+    resetButton.disabled = true;
+    const title = h("h2", { tabindex: -1 }, `${boss.name} wins this time.`);
+    const retry = h("button", { class: "btn primary" }, "Try again");
+    retry.addEventListener("click", restart);
+    panel.prepend(h("div", { class: "defeat" },
+      title,
+      h("p", {}, "You ran out of hearts. Every fight starts fresh, so try again whenever you're ready."),
+      h("div", { class: "row" }, retry, h("a", { class: "btn", href: routeToHash({ name: "island", islandId }) }, `Back to ${island.name}`)),
+    ));
+    title.focus();
+  }
+
+  showRound();
 
   return () => {
     alive = false;
-    window.removeEventListener("pagehide", persistCode);
-    persistCode();
-    editor.destroy();
+    closeEditor();
   };
 }

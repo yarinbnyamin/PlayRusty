@@ -1,4 +1,4 @@
-import type { Island, Mode, SaveData, Stage } from "../src/engine/types";
+import type { BossRound, Island, Mode, SaveData, Stage } from "../src/engine/types";
 
 export function makeStage(id: string, extra: Partial<Stage> = {}): Stage {
   return {
@@ -12,6 +12,17 @@ export function makeStage(id: string, extra: Partial<Stage> = {}): Stage {
   };
 }
 
+export function makeRound(n: number): BossRound {
+  return {
+    title: `Round ${n}`,
+    task: `Task ${n}.`,
+    starter: `fn main() {} // round ${n}`,
+    tests: "#[test]\nfn t() {}",
+    solution: "fn main() {}",
+    hint: `Hint ${n}.`,
+  };
+}
+
 export function makeIsland(id: string, stages: Stage[] = [makeStage("s1"), makeStage("s2")]): Island {
   return {
     id,
@@ -20,14 +31,7 @@ export function makeIsland(id: string, stages: Stage[] = [makeStage("s1"), makeS
     topic: "Topic",
     rustBook: "https://doc.rust-lang.org/book/",
     stages,
-    boss: {
-      name: "Boss",
-      story: "A story.",
-      starter: "fn main() {}",
-      tests: "#[test]\nfn t() {}",
-      solution: "fn main() {}",
-      hints: ["A hint."],
-    },
+    boss: { name: "Boss", story: "A story.", rounds: [1, 2, 3, 4].map(makeRound) },
   };
 }
 

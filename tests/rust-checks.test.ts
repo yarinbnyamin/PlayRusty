@@ -3,7 +3,7 @@ import { collectChecks, crateName } from "../scripts/rust-checks";
 import { makeIsland, makeStage } from "./fixtures";
 
 describe("collectChecks", () => {
-  it("checks runnable examples and both sides of every boss", () => {
+  it("checks runnable examples and both sides of every boss round", () => {
     const stage = makeStage("hello", {
       tutorial: [
         { audience: "all", title: "Run me", text: "", code: "fn main() {}", runnable: true },
@@ -13,8 +13,10 @@ describe("collectChecks", () => {
     const checks = collectChecks([makeIsland("vars", [stage])]);
     expect(checks.map((c) => [c.name, c.kind, c.expect])).toEqual([
       ["vars-hello-page1", "run", "pass"],
-      ["vars-boss-starter", "test", "fail"],
-      ["vars-boss-solution", "test", "pass"],
+      ...[1, 2, 3, 4].flatMap((n) => [
+        [`vars-boss-r${n}-starter`, "test", "fail"],
+        [`vars-boss-r${n}-solution`, "test", "pass"],
+      ]),
     ]);
     expect(checks[1].code).toContain("mod boss_tests");
   });

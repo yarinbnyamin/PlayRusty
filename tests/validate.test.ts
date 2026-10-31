@@ -54,12 +54,14 @@ describe("validateIsland", () => {
     expect(validateIsland(makeIsland("x", [stage])).some((e) => e.includes("runnable"))).toBe(true);
   });
 
-  it("checks the boss", () => {
+  it("checks the boss rounds", () => {
     const island = makeIsland("x");
-    island.boss = { ...island.boss, tests: "fn nope() {}", hints: [] };
+    island.boss = { ...island.boss, rounds: [{ ...island.boss.rounds[0], tests: "fn nope() {}", hint: " ", starter: "let x = 1;" }] };
     const errors = validateIsland(island);
-    expect(errors.some((e) => e.includes("#[test]"))).toBe(true);
-    expect(errors.some((e) => e.includes("hints"))).toBe(true);
+    expect(errors.some((e) => e.includes("3-6 rounds"))).toBe(true);
+    expect(errors).toContain("x/boss/round 1: tests contain no #[test]");
+    expect(errors).toContain("x/boss/round 1: hint is empty");
+    expect(errors).toContain("x/boss/round 1: starter has no fn main");
   });
 });
 
