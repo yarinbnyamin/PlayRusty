@@ -72,10 +72,10 @@ export function renderBoss(root: HTMLElement, ctx: AppContext, islandId: string)
     fight = startFight(boss.rounds.length);
     hp.set(fight.bossHp);
     hearts.set(fight.halves);
-    showRound();
+    showRound(true);
   }
 
-  function showRound(): void {
+  function showRound(focusHeading = false): void {
     closeEditor();
     panel.replaceChildren();
     const round = boss.rounds[fight.round];
@@ -92,12 +92,16 @@ export function renderBoss(root: HTMLElement, ctx: AppContext, islandId: string)
     const roundEditor = createCodeEditor(editorHost, round.starter);
     editor = roundEditor;
     const output = createConsole(consoleHost);
-    if (fight.round > 0) heading.focus();
+    if (focusHeading) heading.focus();
 
     const syncHint = () => {
       hintButton.textContent = `💡 Hint (${fight.hintsLeft} left)`;
       hintButton.disabled = !canHint(fight);
-      const why = fight.roundHinted ? "You've used this round's hint" : fight.hintsLeft === 0 ? "No hints left" : null;
+      const why =
+        fight.status === "roundWon" ? "Round won"
+        : fight.roundHinted ? "You've used this round's hint"
+        : fight.hintsLeft === 0 ? "No hints left"
+        : null;
       if (why) hintButton.title = why;
       else hintButton.removeAttribute("title");
     };
@@ -138,14 +142,14 @@ export function renderBoss(root: HTMLElement, ctx: AppContext, islandId: string)
         const next = h("button", { class: "btn primary" }, "Next round →");
         next.addEventListener("click", () => {
           fight = nextRound(fight);
-          showRound();
+          showRound(true);
         });
         nextRow.append(next);
         next.focus();
         return;
       }
       if (outcome === "miss") {
-        output.showOutput(result.stdout, "", { text: `🛡 ${boss.name} blocked your attack and hit back. You lose a heart.`, kind: "error" });
+        output.showOutput(result.stdout, result.stderr, { text: `🛡 ${boss.name} blocked your attack and hit back. You lose a heart.`, kind: "error" });
       } else {
         output.showOutput("", result.stderr, {
           text: "💨 Your attack fizzled: the code doesn't compile, and you lose half a heart. Read the compiler's message below.",
@@ -153,7 +157,7 @@ export function renderBoss(root: HTMLElement, ctx: AppContext, islandId: string)
         });
       }
       if (fight.status === "lost") {
-        showDefeat(resetButton);
+        showDefeat(consoleHost);
         return;
       }
       runButton.disabled = false;
@@ -161,16 +165,17 @@ export function renderBoss(root: HTMLElement, ctx: AppContext, islandId: string)
     runButton.addEventListener("click", () => void run());
   }
 
-  function showDefeat(resetButton: HTMLButtonElement): void {
-    resetButton.disabled = true;
+  function showDefeat(consoleHost: HTMLElement): void {
+    closeEditor();
     const title = h("h2", { tabindex: -1 }, `${boss.name} wins this time.`);
     const retry = h("button", { class: "btn primary" }, "Try again");
     retry.addEventListener("click", restart);
-    panel.prepend(h("div", { class: "defeat" },
+    const defeatBox = h("div", { class: "defeat" },
       title,
       h("p", {}, "You ran out of hearts. Every fight starts fresh, so try again whenever you're ready."),
       h("div", { class: "row" }, retry, h("a", { class: "btn", href: routeToHash({ name: "island", islandId }) }, `Back to ${island.name}`)),
-    ));
+    );
+    panel.replaceChildren(defeatBox, consoleHost);
     title.focus();
   }
 

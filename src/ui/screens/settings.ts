@@ -19,7 +19,7 @@ export function renderSettings(root: HTMLElement, ctx: AppContext): Cleanup {
       label);
 
   const reset = () => {
-    if (window.confirm("Reset all progress? Your XP, stars, badges and boss code will be erased.")) {
+    if (window.confirm("Reset all progress? Your XP, stars and badges will be erased.")) {
       ctx.resetProgress();
       ctx.go({ name: "title" });
     }

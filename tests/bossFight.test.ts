@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createSaveStore } from "../src/engine/save";
 import { runCode } from "../src/playground/client";
 import { createAppContext } from "../src/ui/app";
-import { renderBoss } from "../src/ui/screens/boss";
-import { emptySave, makeIsland } from "./fixtures";
+import { judgeRun, renderBoss } from "../src/ui/screens/boss";
+import { emptySave, makeIsland, makeRound } from "./fixtures";
 
 vi.mock("../src/playground/client", () => ({ runCode: vi.fn() }));
 const run = vi.mocked(runCode);
@@ -70,7 +70,9 @@ describe("rolling boss fight", () => {
     expect(fight.root.textContent).toContain("💥 Hit! Boss loses 1 HP.");
     expect(fight.hp()).toBe("Boss: 3/4 HP");
     expect(fight.button("▶ Run").disabled).toBe(true);
+    expect(fight.button("💡 Hint").title).toBe("Round won");
     fight.button("Next round →").click();
+    expect(document.activeElement?.textContent).toBe("Round 2 of 4: Round 2");
     expect(fight.heading()).toBe("Round 2 of 4: Round 2");
     expect(fight.button("▶ Run").disabled).toBe(false);
     expect(run.mock.calls[0][0]).toContain("// round 1");
@@ -102,12 +104,21 @@ describe("rolling boss fight", () => {
     await fight.attack(MISS);
     await fight.attack(MISS);
     expect(fight.root.textContent).toContain("Boss wins this time.");
-    expect(fight.button("▶ Run").disabled).toBe(true);
+    expect(fight.button("▶ Run")).toBeUndefined();
+    expect(fight.root.querySelector(".cm-editor")).toBeNull();
     fight.button("Try again").click();
+    expect(document.activeElement?.textContent).toBe("Round 1 of 4: Round 1");
     expect(fight.heading()).toBe("Round 1 of 4: Round 1");
     expect(fight.hearts()).toBe("Your hearts: 3 of 3");
     expect(fight.hp()).toBe("Boss: 4/4 HP");
     expect(fight.root.textContent).not.toContain("wins this time");
+  });
+
+  it("shows the error output when a run ends without test results", async () => {
+    const fight = setup();
+    await fight.attack({ ok: true, success: false, stdout: "running 1 test\n", stderr: "thread 'main' has overflowed its stack" });
+    expect(fight.hearts()).toBe("Your hearts: 2 of 3");
+    expect(fight.root.textContent).toContain("has overflowed its stack");
   });
 
   it("gives one hint per round, about that round only", async () => {
@@ -140,5 +151,26 @@ describe("rolling boss fight", () => {
     await fight.attack(FIZZLE);
     for (let i = 0; i < 4; i += 1) await fight.winRound();
     expect(fight.ctx.getSave().bosses.a).toEqual({ stars: 3 });
+  });
+});
+
+describe("judgeRun", () => {
+  const round = { ...makeRound(1), tests: "#[test]\nfn a() {}\n#[test]\nfn b() {}" };
+  const ok = (name: string) => `test boss_tests::${name} ... ok\n`;
+
+  it("is a hit when every test passes", () => {
+    expect(judgeRun(round, ok("a") + ok("b"), "")).toBe("hit");
+  });
+
+  it("is a miss when a test is missing from the report", () => {
+    expect(judgeRun(round, ok("a"), "")).toBe("miss");
+  });
+
+  it("is a miss when a test fails", () => {
+    expect(judgeRun(round, ok("a") + "test boss_tests::b ... FAILED\n", "")).toBe("miss");
+  });
+
+  it("fizzles when the code doesn't compile", () => {
+    expect(judgeRun(round, "", "error[E0425]: cannot find value\nerror: could not compile")).toBe("fizzle");
   });
 });

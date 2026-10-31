@@ -33,6 +33,7 @@ describe("fight rules", () => {
     fight = attack(fight, "miss");
     expect([fight.halves, fight.status]).toEqual([0, "lost"]);
     expect(attack(fight, "hit")).toBe(fight);
+    expect(attack(attack(attack(startFight(3), "fizzle"), "miss"), "miss").halves).toBe(0);
   });
 
   it("allows one hint per round and n-2 in total", () => {

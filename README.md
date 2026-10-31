@@ -20,7 +20,7 @@ compiled by the real Rust compiler.
 - **Short lessons with runnable examples.** Edit any example and run it on the
   [Rust Playground](https://play.rust-lang.org).
 - **Four puzzle types:** fill the gap, pick the fix, predict the output, spot the bug.
-- **Boss fights on the real compiler.** Hidden `#[test]`s hit the boss; read real compiler errors to win.
+- **Boss fights on the real compiler.** Beat each boss one round at a time: hidden `#[test]`s land the hits, failed tests cost hearts, and you read real compiler errors to win.
 - **XP, stars and badges**, saved in your browser. No account needed.
 - **Skip ahead like Duolingo.** Already know a topic? Fight the island's boss straight away, or jump to a
   locked island by beating its boss. Lessons you skip stay open for XP and stars.
@@ -49,7 +49,7 @@ npm run build        # static site in dist/
 2. Add it to `islands` in `src/content/index.ts`. It disappears from the "coming soon" list automatically.
 3. Follow the teaching rule: never use a concept in a puzzle or boss before a tutorial page teaches it.
    Give every stage pages for both modes (`all`, or both `beginner` and `experienced`).
-4. Every boss needs `starter` (must fail its tests), `solution` (must pass), `tests` and 1–3 `hints`.
+4. Every boss needs 3–6 `rounds`. Each round needs a `title`, a `task`, a `starter` (must fail its tests), a `solution` (must pass), `tests` and one `hint`. Every starter and solution is a complete program with `fn main`.
 5. Run `npm test` and `npm run verify:rust` before opening a pull request.
 
 ## Deploying
