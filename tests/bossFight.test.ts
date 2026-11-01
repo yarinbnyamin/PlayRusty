@@ -58,7 +58,8 @@ describe("rolling boss fight", () => {
   it("starts at round 1 with full HP, 3 hearts and 2 hints", () => {
     const fight = setup();
     expect(fight.heading()).toBe("Round 1 of 4: Round 1");
-    expect(fight.hearts()).toBe("Your hearts: 3 of 3");
+    expect(fight.hearts()).toBe("Your lives: 3 of 3");
+    expect(fight.root.querySelector(".lives-label")?.textContent).toBe("Your lives: 3/3");
     expect(fight.hp()).toBe("Boss: 4/4 HP");
     expect(fight.button("💡 Hint").textContent).toBe("💡 Hint (2 left)");
     expect(fight.button("💡 Hint").disabled).toBe(false);
@@ -82,10 +83,10 @@ describe("rolling boss fight", () => {
   it("costs a whole heart for a failed test and half for a compile error", async () => {
     const fight = setup();
     await fight.attack(MISS);
-    expect(fight.hearts()).toBe("Your hearts: 2 of 3");
+    expect(fight.hearts()).toBe("Your lives: 2 of 3");
     expect(fight.root.textContent).toContain("You lose a heart.");
     await fight.attack(FIZZLE);
-    expect(fight.hearts()).toBe("Your hearts: 1.5 of 3");
+    expect(fight.hearts()).toBe("Your lives: 1.5 of 3");
     expect(fight.root.textContent).toContain("you lose half a heart");
     expect(fight.heading()).toBe("Round 1 of 4: Round 1");
   });
@@ -93,7 +94,7 @@ describe("rolling boss fight", () => {
   it("does not cost a heart when the Playground can't be reached", async () => {
     const fight = setup();
     await fight.attack(DOWN);
-    expect(fight.hearts()).toBe("Your hearts: 3 of 3");
+    expect(fight.hearts()).toBe("Your lives: 3 of 3");
     expect(fight.root.textContent).toContain("The compiler bridge is down.");
   });
 
@@ -109,7 +110,7 @@ describe("rolling boss fight", () => {
     fight.button("Try again").click();
     expect(document.activeElement?.textContent).toBe("Round 1 of 4: Round 1");
     expect(fight.heading()).toBe("Round 1 of 4: Round 1");
-    expect(fight.hearts()).toBe("Your hearts: 3 of 3");
+    expect(fight.hearts()).toBe("Your lives: 3 of 3");
     expect(fight.hp()).toBe("Boss: 4/4 HP");
     expect(fight.root.textContent).not.toContain("wins this time");
   });
@@ -117,7 +118,7 @@ describe("rolling boss fight", () => {
   it("shows the error output when a run ends without test results", async () => {
     const fight = setup();
     await fight.attack({ ok: true, success: false, stdout: "running 1 test\n", stderr: "thread 'main' has overflowed its stack" });
-    expect(fight.hearts()).toBe("Your hearts: 2 of 3");
+    expect(fight.hearts()).toBe("Your lives: 2 of 3");
     expect(fight.root.textContent).toContain("has overflowed its stack");
   });
 

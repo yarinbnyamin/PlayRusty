@@ -48,7 +48,7 @@ Validation: 3 to 6 rounds; every round has a non-empty title, task, starter, sol
 
 ## 4. Boss screen
 
-- Top: back link, `⚔ {boss}`, story, jump notice if any, boss HP bar (`{boss}: x/n HP`), and the player's hearts as ❤️ / 💔 (half) / 🤍 (empty) with `role="img"` and `aria-label="Your hearts: 2.5 of 3"`.
+- Top: back link, `⚔ {boss}`, story, jump notice if any, boss HP bar (`{boss}: x/n HP`), and the player's hearts as ❤️ / 💔 (half) / 🤍 (empty) with `role="img"` and `aria-label="Your lives: 2.5 of 3", under a visible bold label `Your lives: 2.5/3``.
 - Round panel: heading `Round {i} of {n}: {title}`, the task, a code editor with only that round's starter, buttons **▶ Run**, **💡 Hint ({k} left)**, **Reset code**, the hint list (only this round's hint), and the console.
 - Hint button is disabled with title "You've used this round's hint" or "No hints left" when it can't be used.
 - Console headings:
